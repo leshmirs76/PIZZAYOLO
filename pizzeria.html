@@ -560,7 +560,7 @@
         </div>
         <h2 class="font-display text-3xl md:text-5xl font-bold mt-3 text-white">Nos <span class="gold-shine">Pizzas</span></h2>
         <div class="section-title-line"></div>
-        <p class="text-gray-500 mt-4 max-w-lg mx-auto">Pâte pétrie à la main, cuisson au feu de bois, ingrédients premium.</p>
+        <p class="text-gray-500 mt-4 max-w-lg mx-auto">Pâte pétrie à la main, ingrédients frais et de qualité.</p>
         <!-- Size selector -->
         <div class="flex items-center justify-center gap-3 mt-6">
           <button onclick="setSize('senior')" id="btn-senior" class="size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-tomato-500 to-tomato-700 text-white shadow-lg shadow-tomato-500/20">Senior 33cm — 19€</button>
@@ -752,7 +752,12 @@
             <input type="text" id="delivNom" placeholder="Nom & Prénom *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
             <input type="tel" id="delivTel" placeholder="Téléphone *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
             <input type="text" id="delivAdresse" placeholder="Adresse complète *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
-            <input type="text" id="delivCode" placeholder="Code interphone / bâtiment" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900">
+            <div class="flex gap-2">
+              <input type="text" id="delivCP" placeholder="Code postal *" maxlength="5" class="w-[120px] px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required oninput="lookupCity(this.value)">
+              <select id="delivVille" class="flex-1 px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900">
+                <option value="">Ville *</option>
+              </select>
+            </div>
             <textarea id="delivNote" placeholder="Note pour le livreur (optionnel)" rows="2" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900 resize-none"></textarea>
           </div>
         </div>
@@ -964,7 +969,7 @@
       { name:'Client Google', text:'Superbe pizzeria, les pizzas sont excellentes, accueil au top. Les pizzas sont très bien garnies à chaque fois.', stars:5, date:'Google - 4.8/5' },
       { name:'Client Google', text:'Première fois que je mange là-bas et c\'est super bon, je recommande fort ! Service rapide et personnel très sympa.', stars:5, date:'Google - 4.8/5' },
       { name:'Client Google', text:'Vraiment très bon. Le patron est très gentil et l\'ambiance est excellente. Rapport qualité-prix imbattable avec l\'offre 1 achetée = 1 offerte.', stars:5, date:'Google - 4.8/5' },
-      { name:'Client TripAdvisor', text:'Pizzas artisanales cuites au feu de bois, garnitures généreuses. On sent la qualité des ingrédients. Meilleure pizzeria de Canteleu sans hésiter.', stars:5, date:'TripAdvisor - 5/5' },
+      { name:'Client TripAdvisor', text:'Pizzas artisanales avec des garnitures généreuses. On sent la qualité des ingrédients. Meilleure pizzeria de Canteleu sans hésiter.', stars:5, date:'TripAdvisor - 5/5' },
     ];
 
     // ——— ALL ITEMS (flat list for cart lookup) ———
@@ -1645,12 +1650,33 @@
     let stripeInstance = null;
     try { stripeInstance = Stripe(STRIPE_PK); } catch(e) { console.log('Stripe: clé non configurée'); }
 
+    // ——— CITY LOOKUP BY POSTAL CODE ———
+    let cityLookupTimeout = null;
+    function lookupCity(cp) {
+      clearTimeout(cityLookupTimeout);
+      const select = document.getElementById('delivVille');
+      if(cp.length !== 5) { select.innerHTML = '<option value="">Ville *</option>'; return; }
+      cityLookupTimeout = setTimeout(() => {
+        fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom&format=json`)
+          .then(r => r.json())
+          .then(cities => {
+            if(cities.length === 0) {
+              select.innerHTML = '<option value="">Aucune ville trouvée</option>';
+            } else {
+              select.innerHTML = cities.map(c => `<option value="${c.nom}">${c.nom}</option>`).join('');
+            }
+          })
+          .catch(() => { select.innerHTML = '<option value="">Erreur</option>'; });
+      }, 300);
+    }
+
     function getDeliveryInfo() {
       return {
         nom: document.getElementById('delivNom').value.trim(),
         tel: document.getElementById('delivTel').value.trim(),
         adresse: document.getElementById('delivAdresse').value.trim(),
-        code: document.getElementById('delivCode').value.trim(),
+        cp: document.getElementById('delivCP').value.trim(),
+        ville: document.getElementById('delivVille').value,
         note: document.getElementById('delivNote').value.trim(),
       };
     }
@@ -1662,6 +1688,8 @@
       if(!info.nom) { errEl.textContent = 'Merci de renseigner votre nom.'; errEl.classList.remove('hidden'); return false; }
       if(!info.tel) { errEl.textContent = 'Merci de renseigner votre téléphone.'; errEl.classList.remove('hidden'); return false; }
       if(!info.adresse) { errEl.textContent = 'Merci de renseigner votre adresse.'; errEl.classList.remove('hidden'); return false; }
+      if(!info.cp || info.cp.length !== 5) { errEl.textContent = 'Merci de renseigner un code postal valide.'; errEl.classList.remove('hidden'); return false; }
+      if(!info.ville) { errEl.textContent = 'Merci de sélectionner votre ville.'; errEl.classList.remove('hidden'); return false; }
       errEl.classList.add('hidden');
       return true;
     }
@@ -1680,7 +1708,7 @@
       // If Stripe is configured, try to use it for card payments
       if(stripeInstance) {
         // Build line items description
-        const delivDesc = delivInfo ? ` | Livraison: ${delivInfo.nom}, ${delivInfo.tel}, ${delivInfo.adresse}` : '';
+        const delivDesc = delivInfo ? ` | Livraison: ${delivInfo.nom}, ${delivInfo.tel}, ${delivInfo.adresse}, ${delivInfo.cp} ${delivInfo.ville}` : '';
         const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ') + delivDesc;
 
         // Redirect to Stripe Checkout (requires server endpoint)
