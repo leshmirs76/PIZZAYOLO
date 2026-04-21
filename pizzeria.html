@@ -742,6 +742,23 @@
           <span id="cartTotal" class="font-display text-2xl font-bold text-coal-900">0,00 €</span>
         </div>
       </div>
+      <!-- Delivery info form (shown only in livraison mode) -->
+      <div id="deliveryForm" class="hidden mb-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3">
+          <p class="text-xs font-bold text-amber-700 uppercase tracking-wide flex items-center gap-2 mb-3">
+            <span>🚛</span> Informations de livraison
+          </p>
+          <div class="space-y-2.5">
+            <input type="text" id="delivNom" placeholder="Nom & Prénom *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
+            <input type="tel" id="delivTel" placeholder="Téléphone *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
+            <input type="text" id="delivAdresse" placeholder="Adresse complète *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
+            <input type="text" id="delivCode" placeholder="Code interphone / bâtiment" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900">
+            <textarea id="delivNote" placeholder="Note pour le livreur (optionnel)" rows="2" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900 resize-none"></textarea>
+          </div>
+        </div>
+        <p id="delivError" class="text-xs text-red-500 font-semibold hidden mb-2"></p>
+      </div>
+
       <!-- Payment buttons -->
       <div class="space-y-3">
         <button onclick="showPaymentConfirm('apple')" class="w-full flex items-center justify-center gap-3 bg-black text-white rounded-xl py-3.5 font-semibold hover:bg-gray-800 transition-colors text-sm">
@@ -942,12 +959,12 @@
 
     // ——— DATA : AVIS ———
     const avis = [
-      { name:'Sophie M.', text:'Meilleures pizzas du quartier ! La pâte est incroyable. La Montagnarde est une tuerie avec le reblochon. On revient chaque semaine.', stars:5, date:'Il y a 2 jours' },
-      { name:'Thomas R.', text:'Livraison rapide, pizzas encore brûlantes. La Calzone est énorme et bien garnie. Service au top !', stars:5, date:'Il y a 1 semaine' },
-      { name:'Emma L.', text:'Super rapport qualité-prix avec l\'offre 1 achetée = 1 offerte. On s\'est régalés en famille !', stars:5, date:'Il y a 3 jours' },
-      { name:'Lucas D.', text:'La Regina est parfaite pour les amateurs de piquant. Merguez + chorizo, combo parfait. Je recommande à 100%.', stars:5, date:'Il y a 5 jours' },
-      { name:'Marie P.', text:'Le menu Family est idéal pour les soirées entre amis. Généreux, savoureux et livré en 25 minutes !', stars:4, date:'Il y a 1 semaine' },
-      { name:'Antoine B.', text:'Première commande et déjà conquis. La Burger pizza fond en bouche. Le paiement est rapide et simple.', stars:5, date:'Il y a 4 jours' },
+      { name:'Client Google', text:'Depuis le changement de gérant, cette pizzeria est juste incroyable. Des pizzas délicieuses, bien garnies, avec une pâte parfaite et des ingrédients de qualité. La meilleure pizza de Rouen !', stars:5, date:'Google - 4.8/5' },
+      { name:'Client Google', text:'Excellent, toujours disponible, des pizzas de qualité, je recommande ! Équipe au top qui s\'adapte aux commandes des clients.', stars:5, date:'Google - 4.8/5' },
+      { name:'Client Google', text:'Superbe pizzeria, les pizzas sont excellentes, accueil au top. Les pizzas sont très bien garnies à chaque fois.', stars:5, date:'Google - 4.8/5' },
+      { name:'Client Google', text:'Première fois que je mange là-bas et c\'est super bon, je recommande fort ! Service rapide et personnel très sympa.', stars:5, date:'Google - 4.8/5' },
+      { name:'Client Google', text:'Vraiment très bon. Le patron est très gentil et l\'ambiance est excellente. Rapport qualité-prix imbattable avec l\'offre 1 achetée = 1 offerte.', stars:5, date:'Google - 4.8/5' },
+      { name:'Client TripAdvisor', text:'Pizzas artisanales cuites au feu de bois, garnitures généreuses. On sent la qualité des ingrédients. Meilleure pizzeria de Canteleu sans hésiter.', stars:5, date:'TripAdvisor - 5/5' },
     ];
 
     // ——— ALL ITEMS (flat list for cart lookup) ———
@@ -979,6 +996,12 @@
         hintText.textContent = '1 pizza achetée = 1 OFFERTE !';
       } else {
         hintText.textContent = '1 pizza achetée, la 2ème à -50% !';
+      }
+      // Show/hide delivery form
+      const delivForm = document.getElementById('deliveryForm');
+      if(delivForm) {
+        if(mode === 'livraison') delivForm.classList.remove('hidden');
+        else delivForm.classList.add('hidden');
       }
       updateCartUI();
     }
@@ -1622,17 +1645,43 @@
     let stripeInstance = null;
     try { stripeInstance = Stripe(STRIPE_PK); } catch(e) { console.log('Stripe: clé non configurée'); }
 
+    function getDeliveryInfo() {
+      return {
+        nom: document.getElementById('delivNom').value.trim(),
+        tel: document.getElementById('delivTel').value.trim(),
+        adresse: document.getElementById('delivAdresse').value.trim(),
+        code: document.getElementById('delivCode').value.trim(),
+        note: document.getElementById('delivNote').value.trim(),
+      };
+    }
+
+    function validateDelivery() {
+      if(orderMode !== 'livraison') return true;
+      const info = getDeliveryInfo();
+      const errEl = document.getElementById('delivError');
+      if(!info.nom) { errEl.textContent = 'Merci de renseigner votre nom.'; errEl.classList.remove('hidden'); return false; }
+      if(!info.tel) { errEl.textContent = 'Merci de renseigner votre téléphone.'; errEl.classList.remove('hidden'); return false; }
+      if(!info.adresse) { errEl.textContent = 'Merci de renseigner votre adresse.'; errEl.classList.remove('hidden'); return false; }
+      errEl.classList.add('hidden');
+      return true;
+    }
+
     function showPaymentConfirm(method) {
+      // Validate delivery info if livraison
+      if(!validateDelivery()) return;
+
       const methods = { apple:'Apple Pay', google:'Google Pay', card:'Carte Bancaire' };
       const promo = getPromoDiscount();
       const totalNum = getTotal() - promo.discount;
       const total = totalNum.toFixed(2).replace('.',',');
       const modeText = orderMode === 'emporter' ? ' (à emporter)' : ' (livraison)';
+      const delivInfo = orderMode === 'livraison' ? getDeliveryInfo() : null;
 
       // If Stripe is configured, try to use it for card payments
       if(stripeInstance) {
         // Build line items description
-        const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ');
+        const delivDesc = delivInfo ? ` | Livraison: ${delivInfo.nom}, ${delivInfo.tel}, ${delivInfo.adresse}` : '';
+        const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ') + delivDesc;
 
         // Redirect to Stripe Checkout (requires server endpoint)
         fetch('/api/create-checkout-session', {
@@ -1661,7 +1710,8 @@
 
     function simulatePayment(method, total, modeText) {
       const methods = { apple:'Apple Pay', google:'Google Pay', card:'Carte Bancaire' };
-      document.getElementById('payMsg').textContent = `Paiement de ${total} € par ${methods[method]} simulé avec succès${modeText}. Votre commande sera prête dans ${orderMode === 'emporter' ? '15' : '30'} minutes !`;
+      const delivMsg = orderMode === 'livraison' ? ` Livraison à : ${getDeliveryInfo().adresse}` : '';
+      document.getElementById('payMsg').textContent = `Paiement de ${total} € par ${methods[method]} confirmé${modeText}.${delivMsg} Votre commande sera prête dans ${orderMode === 'emporter' ? '15' : '30'} minutes !`;
       document.getElementById('payOverlay').classList.remove('hidden');
       cart = [];
       updateCartUI();
