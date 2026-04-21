@@ -264,6 +264,14 @@
     /* ===== SECTION REVEAL ===== */
     .section-reveal { opacity:0; transform:translateY(50px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
     .section-reveal.visible { opacity:1; transform:translateY(0); }
+    /* Fallback: force visible after 2s if JS fails */
+    .force-visible .section-reveal,
+    .force-visible .card-reveal { opacity:1 !important; transform:none !important; }
+    .force-visible .animate-fadeInUp,
+    .force-visible .animate-fadeInDown,
+    .force-visible .animate-fadeInLeft,
+    .force-visible .animate-fadeInRight,
+    .force-visible .animate-fadeInScale { opacity:1 !important; transform:none !important; }
 
     /* ===== CARD STAGGER ON SCROLL ===== */
     .card-reveal { opacity:0; transform:translateY(40px) scale(0.95); transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1); }
@@ -1667,5 +1675,11 @@
     renderSmallGrid(boissons, 'boissonGrid', 'boisson', 'basil');
     renderAvis();
   </script>
+<script>
+// Fallback: si après 2s les sections sont toujours invisibles, on force l'affichage
+setTimeout(function(){
+  document.body.classList.add('force-visible');
+}, 2000);
+</script>
 </body>
 </html>
