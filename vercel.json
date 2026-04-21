@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm install",
+  "outputDirectory": ".",
+  "framework": null,
+  "rewrites": [
+    { "source": "/create-checkout-session", "destination": "/api/create-checkout-session" },
+    { "source": "/", "destination": "/pizzeria.html" }
+  ]
+}

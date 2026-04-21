@@ -1,2 +1,9 @@
 node_modules/
 .env
+# Exclure les gros PNG source (on garde que les webp optimisés)
+base tomate/*.png
+base creme/*.png
+BOISSON/*.png
+Pizza-yolo-menu-17v.jpg
+menu.pdf
+STRIPE-SETUP.md
