@@ -1630,7 +1630,7 @@
       const modeText = orderMode === 'emporter' ? ' (à emporter)' : ' (livraison)';
 
       // If Stripe is configured, try to use it for card payments
-      if(stripeInstance && STRIPE_PK !== 'pk_test_51TOJ14V05KiIkBIuKH6kQ60LyJRgQqvQvB9LvYGdYliFf0ovSgXRo0P5WvufU3jN6qrGsB7RS1t0JtGbsJgo8ina00ZYwYu6jd') {
+      if(stripeInstance) {
         // Build line items description
         const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ');
 
