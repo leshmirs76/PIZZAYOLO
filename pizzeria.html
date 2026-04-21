@@ -1635,7 +1635,7 @@
         const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ');
 
         // Redirect to Stripe Checkout (requires server endpoint)
-        fetch('/create-checkout-session', {
+        fetch('/api/create-checkout-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
