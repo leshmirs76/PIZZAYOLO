@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizza Yolo — Pizzeria à Canteleu</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tomato: { 50:'#fef2f2', 100:'#fee2e2', 200:'#fecaca', 500:'#D32F2F', 600:'#C62828', 700:'#B71C1C', 800:'#8B1A1A' },
+            basil: { 50:'#f0fdf4', 100:'#dcfce7', 500:'#2E7D32', 600:'#1B5E20', 700:'#145218' },
+            crust: { 50:'#FFFBF0', 100:'#FFF3D6', 200:'#FFE4A0', 300:'#F5D78E' },
+            coal: { 800:'#1F1F1F', 900:'#121212' }
+          },
+          fontFamily: {
+            display: ['Poppins', 'sans-serif'],
+            body: ['Nunito', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Nunito', sans-serif; overflow-x:hidden; background:#0a0a0a; }
+    .font-display { font-family: 'Poppins', sans-serif; }
+
+    /* ===== KEYFRAMES ===== */
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-30px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeInLeft { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes fadeInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes fadeInScale { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+    @keyframes slideIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+    @keyframes slideOut { from { transform:translateX(0); } to { transform:translateX(100%); } }
+    @keyframes pulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+    @keyframes float { 0%,100%{ transform:translateY(0) rotate(0deg); } 25%{ transform:translateY(-15px) rotate(5deg); } 75%{ transform:translateY(-5px) rotate(-3deg); } }
+    @keyframes floatSlow { 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-20px) rotate(8deg); } }
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    @keyframes spinSlow { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    @keyframes modalIn { from { opacity:0; transform:scale(0.85) translateY(30px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    @keyframes badgePop { 0%{ transform:scale(0); } 50%{ transform:scale(1.4); } 70%{ transform:scale(0.9); } 100%{ transform:scale(1); } }
+    @keyframes shimmer { 0%{ background-position:-200% 0; } 100%{ background-position:200% 0; } }
+    @keyframes gradientShift { 0%{ background-position:0% 50%; } 50%{ background-position:100% 50%; } 100%{ background-position:0% 50%; } }
+    @keyframes glow { 0%,100%{ box-shadow:0 0 20px rgba(211,47,47,0.3); } 50%{ box-shadow:0 0 40px rgba(211,47,47,0.6),0 0 80px rgba(211,47,47,0.2); } }
+    @keyframes glowGreen { 0%,100%{ box-shadow:0 0 20px rgba(46,125,50,0.3); } 50%{ box-shadow:0 0 40px rgba(46,125,50,0.6),0 0 80px rgba(46,125,50,0.2); } }
+    @keyframes glowGold { 0%,100%{ box-shadow:0 0 15px rgba(212,175,55,0.2); } 50%{ box-shadow:0 0 30px rgba(212,175,55,0.4),0 0 60px rgba(212,175,55,0.1); } }
+    @keyframes ripple { to { transform:scale(4); opacity:0; } }
+    @keyframes bounceIn { 0%{ opacity:0; transform:scale(0.3); } 50%{ transform:scale(1.05); } 70%{ transform:scale(0.9); } 100%{ opacity:1; transform:scale(1); } }
+    @keyframes wiggle { 0%,100%{ transform:rotate(0deg); } 25%{ transform:rotate(-8deg); } 75%{ transform:rotate(8deg); } }
+    @keyframes heroTextReveal { 0%{ clip-path:inset(0 100% 0 0); } 100%{ clip-path:inset(0 0% 0 0); } }
+    @keyframes borderGlow { 0%,100%{ border-color:rgba(211,47,47,0.2); } 50%{ border-color:rgba(211,47,47,0.6); } }
+    @keyframes orbitSlow { 0%{ transform:rotate(0deg) translateX(120px) rotate(0deg); } 100%{ transform:rotate(360deg) translateX(120px) rotate(-360deg); } }
+    @keyframes grain { 0%,100%{ transform:translate(0,0); } 10%{ transform:translate(-5%,-10%); } 30%{ transform:translate(3%,2%); } 50%{ transform:translate(-3%,5%); } 70%{ transform:translate(7%,-3%); } 90%{ transform:translate(-1%,6%); } }
+    @keyframes textGlow { 0%,100%{ text-shadow:0 0 20px rgba(211,47,47,0.3); } 50%{ text-shadow:0 0 40px rgba(211,47,47,0.6), 0 0 80px rgba(211,47,47,0.2); } }
+    @keyframes borderRotate { from { --angle:0deg; } to { --angle:360deg; } }
+
+    .animate-fadeInUp { animation: fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
+    .animate-fadeInDown { animation: fadeInDown 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
+    .animate-fadeInLeft { animation: fadeInLeft 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
+    .animate-fadeInRight { animation: fadeInRight 0.8s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
+    .animate-fadeInScale { animation: fadeInScale 0.6s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
+    .animate-slideIn { animation: slideIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .animate-slideOut { animation: slideOut 0.3s ease-in forwards; }
+    .animate-pulse-promo { animation: pulse 2s ease-in-out infinite; }
+    .animate-float { animation: float 4s ease-in-out infinite; }
+    .animate-floatSlow { animation: floatSlow 6s ease-in-out infinite; }
+    .animate-spinSlow { animation: spinSlow 20s linear infinite; }
+    .animate-modalIn { animation: modalIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .animate-badgePop { animation: badgePop 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .animate-bounceIn { animation: bounceIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .animate-wiggle { animation: wiggle 0.5s ease-in-out; }
+    .animate-glow { animation: glow 2s ease-in-out infinite; }
+    .animate-glowGreen { animation: glowGreen 2s ease-in-out infinite; }
+    .animate-heroReveal { animation: heroTextReveal 1s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    .stagger-1 { animation-delay: 0.15s; }
+    .stagger-2 { animation-delay: 0.3s; }
+    .stagger-3 { animation-delay: 0.45s; }
+    .stagger-4 { animation-delay: 0.6s; }
+    .stagger-5 { animation-delay: 0.75s; }
+
+    /* ===== GOLD ACCENTS ===== */
+    .text-gold { color: #D4AF37; }
+    .bg-gold { background: linear-gradient(135deg, #D4AF37, #F5E6A3, #D4AF37); }
+    .border-gold { border-color: rgba(212,175,55,0.3); }
+    .gold-shine { background: linear-gradient(90deg, #D4AF37, #F5E6A3, #D4AF37); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% auto; animation: shimmer 3s linear infinite; }
+
+    /* ===== HERO ===== */
+    .hero-bg {
+      background: #0a0a0a;
+      position: relative; overflow: hidden; min-height:100vh;
+    }
+    .hero-bg::before {
+      content:''; position:absolute; inset:0; z-index:1;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(211,47,47,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 20% 80%, rgba(212,175,55,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(46,125,50,0.08) 0%, transparent 50%);
+    }
+    .hero-bg::after {
+      content:''; position:absolute; inset:0; z-index:2;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events:none;
+    }
+    #heroParticles { position:absolute; inset:0; pointer-events:none; z-index:3; }
+
+    /* Hero decorative rings */
+    .hero-ring {
+      position:absolute; border-radius:50%; border:1px solid rgba(212,175,55,0.08);
+      pointer-events:none; z-index:1;
+    }
+    .hero-ring-1 { width:600px; height:600px; top:50%; left:50%; transform:translate(-50%,-50%); }
+    .hero-ring-2 { width:900px; height:900px; top:50%; left:50%; transform:translate(-50%,-50%); border-color:rgba(211,47,47,0.05); }
+    .hero-ring-3 { width:1200px; height:1200px; top:50%; left:50%; transform:translate(-50%,-50%); border-color:rgba(255,255,255,0.02); }
+
+    /* ===== GLASSMORPHISM ===== */
+    .glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .glass-light {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .glass-dark {
+      background: rgba(10,10,10,0.8);
+      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ===== PRODUCT CARDS — PREMIUM ===== */
+    .product-card {
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.5s ease, border-color 0.3s ease;
+      position:relative; overflow:hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(18,18,18,0.6);
+      backdrop-filter: blur(10px);
+    }
+    .product-card::before {
+      content:''; position:absolute; inset:0; z-index:0;
+      background: linear-gradient(135deg, transparent 30%, rgba(211,47,47,0.05) 100%);
+      opacity:0; transition: opacity 0.5s ease;
+    }
+    .product-card:hover::before { opacity:1; }
+    .product-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 30px rgba(211,47,47,0.1);
+      border-color: rgba(212,175,55,0.2);
+    }
+    .product-card:active { transform: translateY(-2px) scale(0.99); }
+
+    .product-card .card-emoji { transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    .product-card:hover .card-emoji { transform: scale(1.25) rotate(-10deg); }
+
+    /* ===== PIZZA PHOTO CARD ===== */
+    .pizza-img-wrap {
+      width: 180px; height: 180px;
+      margin: 0 auto;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), box-shadow 0.6s ease;
+    }
+    .product-card:hover .pizza-img-wrap {
+      transform: scale(1.08) rotate(-3deg);
+      box-shadow: 0 12px 40px rgba(211,47,47,0.25), 0 0 60px rgba(211,47,47,0.1), 0 0 0 2px rgba(212,175,55,0.3);
+    }
+    .pizza-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.5s ease;
+      filter: brightness(0.95) contrast(1.05);
+    }
+    .product-card:hover .pizza-img-wrap img {
+      transform: scale(1.15);
+      filter: brightness(1.1) contrast(1.08);
+    }
+    /* Glow ring behind the pizza */
+    .pizza-glow {
+      position: absolute; inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(211,47,47,0.15) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .product-card:hover .pizza-glow { opacity: 1; }
+    /* Inner ring decoration */
+    .pizza-ring {
+      position: absolute; inset: -3px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      background: linear-gradient(135deg, rgba(212,175,55,0.4), transparent 50%, rgba(211,47,47,0.3)) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    .product-card:hover .pizza-ring { opacity: 1; }
+
+    /* ===== BUTTONS ===== */
+    .btn-add {
+      position:relative; overflow:hidden; transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      background: linear-gradient(135deg, #D32F2F, #B71C1C);
+    }
+    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(211,47,47,0.4); }
+    .btn-add:active { transform: translateY(0) scale(0.97); }
+    .btn-add .ripple {
+      position:absolute; border-radius:50%; background:rgba(255,255,255,0.4);
+      width:20px; height:20px; animation: ripple 0.6s ease-out;
+      pointer-events:none;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    .cart-body::-webkit-scrollbar { width:6px; }
+    .cart-body::-webkit-scrollbar-track { background:#1a1a1a; border-radius:10px; }
+    .cart-body::-webkit-scrollbar-thumb { background:#333; border-radius:10px; }
+
+    /* ===== BADGE ===== */
+    .cart-badge { min-width:20px; height:20px; font-size:11px; }
+
+    /* ===== PROMO CARDS ===== */
+    .promo-card {
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.5s ease;
+      position:relative; overflow:hidden;
+    }
+    .promo-card::before {
+      content:''; position:absolute; inset:-1px; z-index:-1; border-radius:inherit;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 50%, rgba(255,255,255,0.05));
+      pointer-events:none;
+    }
+    .promo-card::after {
+      content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
+      animation: shimmer 3s ease-in-out infinite;
+      background-size: 200% 200%;
+    }
+    .promo-card:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+
+    /* ===== NAV ===== */
+    .nav-link { position:relative; transition: color 0.3s ease; }
+    .nav-link::after { content:''; position:absolute; bottom:-4px; left:50%; width:0; height:3px; background: linear-gradient(90deg, #D32F2F, #D4AF37); border-radius:2px; transition:all 0.4s cubic-bezier(0.16,1,0.3,1); transform:translateX(-50%); }
+    .nav-link:hover::after, .nav-link.active::after { width:120%; }
+    .nav-link:hover { color:#D32F2F; }
+    .navbar-glass { background:rgba(10,10,10,0.85) !important; backdrop-filter:blur(20px) !important; -webkit-backdrop-filter:blur(20px) !important; border-bottom:1px solid rgba(255,255,255,0.06) !important; }
+    .navbar-scrolled { background:rgba(10,10,10,0.95) !important; box-shadow: 0 4px 30px rgba(0,0,0,0.3), 0 1px 0 rgba(212,175,55,0.1) !important; }
+
+    /* ===== SECTION REVEAL ===== */
+    .section-reveal { opacity:0; transform:translateY(50px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+    .section-reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* ===== CARD STAGGER ON SCROLL ===== */
+    .card-reveal { opacity:0; transform:translateY(40px) scale(0.95); transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+    .card-reveal.visible { opacity:1; transform:translateY(0) scale(1); }
+
+    /* ===== OVERLAY ===== */
+    .overlay-bg { background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); transition: opacity 0.3s ease; }
+
+    /* ===== STARS ===== */
+    .star { color: #D4AF37; display:inline-block; }
+    .star-animated { animation: bounceIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards; opacity:0; }
+
+    /* ===== SECTION TITLE UNDERLINE ===== */
+    .section-title-line { width:60px; height:3px; background: linear-gradient(90deg, #D32F2F, #D4AF37); border-radius:2px; margin:16px auto 0; transition: width 0.6s ease; }
+    .section-reveal.visible .section-title-line { width:100px; }
+
+    /* ===== FLOATING EMOJIS IN HERO ===== */
+    .hero-emoji { position:absolute; pointer-events:none; opacity:0.06; z-index:2; filter:blur(1px); }
+
+    /* ===== TAG BADGE ===== */
+    .tag-badge { animation: fadeInScale 0.4s cubic-bezier(0.16,1,0.3,1) forwards; animation-delay:0.3s; opacity:0; background: linear-gradient(135deg, #D32F2F, #B71C1C); }
+
+    /* ===== PRICE ===== */
+    .price-tag { transition: transform 0.3s ease, color 0.3s ease; color:#D4AF37; }
+    .product-card:hover .price-tag { transform:scale(1.1); }
+
+    /* ===== PARALLAX ===== */
+    .parallax-layer { transition: transform 0.1s linear; will-change: transform; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(100px); opacity:0;
+      z-index:100; transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      pointer-events:none;
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    /* ===== AVIS CARD ===== */
+    .avis-card {
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.5s ease;
+      background: rgba(18,18,18,0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .avis-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.3), 0 0 20px rgba(212,175,55,0.05); border-color: rgba(212,175,55,0.15); }
+
+    /* ===== SIZE SELECTOR ===== */
+    .size-btn { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .size-btn:hover { transform: translateY(-2px); }
+    .size-btn:active { transform: scale(0.95); }
+
+    /* ===== SECTION DIVIDER ===== */
+    .section-divider {
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), rgba(211,47,47,0.2), rgba(212,175,55,0.2), transparent);
+    }
+
+    /* ===== PREMIUM SECTION BG ===== */
+    .dark-section { background: #0a0a0a; color:#fff; }
+    .dark-section-alt { background: linear-gradient(180deg, #0e0e0e 0%, #121212 50%, #0e0e0e 100%); color:#fff; }
+
+    /* ===== THEME TOGGLE ===== */
+    .theme-toggle {
+      width:44px; height:24px; border-radius:12px; position:relative; cursor:pointer;
+      background: rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);
+      transition: all 0.4s ease;
+    }
+    .theme-toggle::after {
+      content:''; position:absolute; top:2px; left:2px;
+      width:18px; height:18px; border-radius:50%;
+      background:#D4AF37; transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* ======== LIGHT THEME ======== */
+    body.light { background: #f5f0eb; color: #1a1a1a; }
+    body.light .theme-toggle { background: #e8e0d4; border-color:#d4c9b8; }
+    body.light .theme-toggle::after { transform: translateX(20px); background:#D32F2F; }
+
+    body.light .navbar-glass { background:rgba(255,255,255,0.9) !important; border-bottom:1px solid rgba(0,0,0,0.06) !important; }
+    body.light .navbar-scrolled { background:rgba(255,255,255,0.98) !important; box-shadow: 0 4px 30px rgba(0,0,0,0.08) !important; }
+    body.light .nav-link { color: #444 !important; }
+    body.light .nav-link:hover { color: #D32F2F !important; }
+    body.light #menuIcon, body.light #closeIcon { color: #333; }
+
+    body.light .hero-bg { background: linear-gradient(135deg, #1a0505 0%, #2a0a0a 50%, #1a0505 100%); }
+
+    body.light .dark-section { background: #f5f0eb; }
+    body.light .dark-section-alt { background: linear-gradient(180deg, #efe8df 0%, #f5f0eb 50%, #efe8df 100%); }
+    body.light .section-divider { background: linear-gradient(90deg, transparent, rgba(211,47,47,0.15), rgba(212,175,55,0.15), rgba(211,47,47,0.15), transparent); }
+
+    body.light .product-card {
+      background: rgba(255,255,255,0.8);
+      border-color: rgba(0,0,0,0.06);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    body.light .product-card:hover {
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1), 0 0 20px rgba(211,47,47,0.06);
+      border-color: rgba(211,47,47,0.15);
+    }
+    body.light .product-card h3, body.light h2, body.light h3 { color: #1a1a1a !important; }
+    body.light .product-card p, body.light .text-gray-500 { color: #777 !important; }
+    body.light .price-tag { color: #D32F2F !important; }
+    body.light .text-gold { color: #b8860b !important; }
+    body.light .gold-shine { background: linear-gradient(90deg, #D32F2F, #b8860b, #D32F2F); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% auto; animation: shimmer 3s linear infinite; }
+
+    body.light .glass { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.08); }
+    body.light .glass span { color: #666 !important; }
+
+    body.light .pizza-img-wrap { box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06); }
+    body.light .product-card:hover .pizza-img-wrap { box-shadow: 0 12px 40px rgba(211,47,47,0.15), 0 0 0 2px rgba(211,47,47,0.2); }
+    body.light .pizza-glow { background: radial-gradient(circle, rgba(211,47,47,0.08) 0%, transparent 70%); }
+
+    body.light .avis-card { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.06); }
+    body.light .avis-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: rgba(211,47,47,0.12); }
+    body.light .avis-card p { color: #555 !important; }
+
+    body.light .star { color: #D4AF37; }
+    body.light .section-title-line { background: linear-gradient(90deg, #D32F2F, #b8860b); }
+
+    body.light footer { background: #1a1a1a !important; }
+    body.light .toast .glass-dark { background: rgba(255,255,255,0.95) !important; color: #1a1a1a !important; border-color: rgba(0,0,0,0.08) !important; }
+
+    body.light .size-btn { color: #555 !important; }
+    body.light .cart-btn-area button { color: #333; }
+    body.light .cart-btn-area button svg { color: #333; }
+  </style>
+</head>
+<body class="bg-[#0a0a0a] text-white font-body">
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 navbar-glass">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <!-- Logo -->
+        <a href="#hero" class="flex items-center gap-2 group">
+          <img src="logo.webp" onerror="this.src='logo.png'" alt="Pizza Yolo" class="h-12 md:h-14 w-auto object-contain drop-shadow-lg">
+        </a>
+        <!-- Desktop nav -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#pizzas" class="nav-link text-sm font-medium text-gray-300 hover:text-tomato-500 transition-colors">Pizzas</a>
+          <a href="#menus" class="nav-link text-sm font-medium text-gray-300 hover:text-tomato-500 transition-colors">Menus</a>
+          <a href="#boissons" class="nav-link text-sm font-medium text-gray-300 hover:text-tomato-500 transition-colors">Boissons</a>
+          <a href="#avis" class="nav-link text-sm font-medium text-gray-300 hover:text-tomato-500 transition-colors">Avis</a>
+          <a href="tel:+33235083338" class="ml-2 px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-tomato-500 to-tomato-700 text-white hover:shadow-lg hover:shadow-tomato-500/25 transition-all">02 35 08 33 38</a>
+        </div>
+        <!-- Theme + Cart + Mobile menu -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2">
+            <span class="text-xs" id="themeIcon">🌙</span>
+            <div class="theme-toggle" onclick="toggleTheme()" title="Mode clair/sombre"></div>
+          </div>
+          <button onclick="toggleCart()" class="relative p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group cart-btn-area" aria-label="Ouvrir le panier">
+            <svg class="w-5 h-5 text-gray-300 group-hover:text-tomato-500 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+            <span id="cartBadge" class="cart-badge absolute -top-1 -right-1 bg-gradient-to-r from-tomato-500 to-tomato-700 text-white rounded-full flex items-center justify-center font-bold hidden">0</span>
+          </button>
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all" aria-label="Menu">
+            <svg id="menuIcon" class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="closeIcon" class="w-5 h-5 text-gray-300 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- Mobile menu -->
+      <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-white/10">
+        <div class="flex flex-col gap-1 pt-3">
+          <a href="#pizzas" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-tomato-500 transition-colors">Pizzas</a>
+          <a href="#menus" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-tomato-500 transition-colors">Menus</a>
+          <a href="#boissons" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-tomato-500 transition-colors">Boissons</a>
+          <a href="#avis" onclick="closeMobileMenu()" class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-tomato-500 transition-colors">Avis</a>
+          <a href="tel:+33235083338" class="mx-4 mt-2 text-center py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-tomato-500 to-tomato-700 text-white">02 35 08 33 38</a>
+          <div class="flex items-center justify-center gap-2 mt-3 sm:hidden">
+            <span class="text-xs" id="themeIconMobile">🌙</span>
+            <div class="theme-toggle" onclick="toggleTheme()" title="Mode clair/sombre"></div>
+            <span class="text-xs text-gray-400">Mode clair</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <section id="hero" class="hero-bg min-h-screen flex items-center pt-16 relative overflow-hidden">
+    <canvas id="heroParticles"></canvas>
+    <!-- Decorative rings -->
+    <div class="hero-ring hero-ring-1"></div>
+    <div class="hero-ring hero-ring-2"></div>
+    <div class="hero-ring hero-ring-3"></div>
+    <!-- Floating emojis -->
+    <div class="hero-emoji text-8xl md:text-9xl animate-float select-none" style="top:10%;right:8%;animation-duration:5s" aria-hidden="true">🍕</div>
+    <div class="hero-emoji text-7xl animate-floatSlow select-none" style="bottom:15%;left:5%;animation-delay:1s" aria-hidden="true">🌿</div>
+    <div class="hero-emoji text-6xl animate-float select-none" style="top:60%;right:15%;animation-delay:2s;animation-duration:6s" aria-hidden="true">🧀</div>
+    <div class="hero-emoji text-5xl animate-floatSlow select-none" style="top:25%;left:12%;animation-delay:0.5s" aria-hidden="true">🍅</div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 w-full relative z-10">
+      <!-- Hero logo display -->
+      <div class="flex justify-center mb-8 animate-fadeInDown">
+        <img src="logo.webp" onerror="this.src='logo.png'" alt="Pizza Yolo" class="h-32 md:h-44 w-auto object-contain drop-shadow-2xl" style="filter:drop-shadow(0 0 40px rgba(211,47,47,0.3))">
+      </div>
+
+      <div class="text-center mb-12 md:mb-16">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-6 animate-fadeInDown stagger-1">
+          <span class="w-2 h-2 rounded-full bg-basil-500 animate-pulse"></span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Pizzeria à Canteleu</span>
+        </div>
+        <h1 class="font-display text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight mb-6">
+          <span class="inline-block animate-fadeInUp stagger-1">Le goût de l'Italie,</span><br>
+          <span class="inline-block animate-heroReveal stagger-2 bg-gradient-to-r from-tomato-500 via-red-400 to-tomato-500 bg-clip-text text-transparent" style="animation:heroTextReveal 1s cubic-bezier(0.16,1,0.3,1) forwards, textGlow 3s ease-in-out infinite; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">livré chez vous.</span>
+        </h1>
+        <p class="text-gray-500 text-base md:text-lg max-w-2xl mx-auto animate-fadeInUp stagger-3">
+          Des pizzas généreuses, fraîches et savoureuses — à emporter ou livrées chez vous en 30 minutes.
+        </p>
+      </div>
+
+      <!-- Promo Cards -->
+      <div class="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <!-- A emporter -->
+        <div class="promo-card animate-fadeInLeft stagger-3 animate-glow rounded-2xl p-6 md:p-8 bg-gradient-to-br from-tomato-600/20 to-tomato-800/30 text-white cursor-pointer" onclick="setOrderMode('emporter');document.getElementById('pizzas').scrollIntoView({behavior:'smooth'})">
+          <div class="flex items-start justify-between mb-4">
+            <span class="bg-tomato-500/20 border border-tomato-500/30 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider text-tomato-200">À emporter</span>
+            <span class="text-4xl animate-pulse-promo" aria-hidden="true">🎉</span>
+          </div>
+          <h3 class="font-display text-2xl md:text-3xl font-bold mb-2">1 achetée<br>= 1 <span class="gold-shine">OFFERTE</span> !</h3>
+          <p class="text-gray-400 text-sm">Sur toutes nos pizzas. Offre valable en magasin uniquement.</p>
+          <div class="mt-5 inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 transition-all rounded-full px-5 py-2.5 text-sm font-semibold">
+            Commander
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+        <!-- Livraison -->
+        <div class="promo-card animate-fadeInRight stagger-4 animate-glowGreen rounded-2xl p-6 md:p-8 bg-gradient-to-br from-basil-500/20 to-basil-700/30 text-white cursor-pointer" onclick="setOrderMode('livraison');document.getElementById('pizzas').scrollIntoView({behavior:'smooth'})">
+          <div class="flex items-start justify-between mb-4">
+            <span class="bg-basil-500/20 border border-basil-500/30 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-300">Livraison</span>
+            <span class="text-4xl animate-pulse-promo" style="animation-delay:0.5s" aria-hidden="true">🛵</span>
+          </div>
+          <h3 class="font-display text-2xl md:text-3xl font-bold mb-2">La 2ème pizza<br>à <span class="gold-shine">-50%</span> !</h3>
+          <p class="text-gray-400 text-sm">Réduction appliquée sur la moins chère. Livraison en 30 min.</p>
+          <div class="mt-5 inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 transition-all rounded-full px-5 py-2.5 text-sm font-semibold">
+            Se faire livrer
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="flex flex-wrap items-center justify-center gap-6 md:gap-12 mt-12 animate-fadeInUp stagger-5">
+        <div class="flex items-center gap-2 text-gray-500">
+          <span class="text-gold text-lg">★</span>
+          <span class="text-sm font-semibold text-gray-300">4.9/5</span>
+          <span class="text-xs text-gray-600">— 350+ avis</span>
+        </div>
+        <div class="w-px h-4 bg-white/10 hidden sm:block"></div>
+        <div class="flex items-center gap-2 text-gray-500">
+          <span class="text-sm">🕐</span>
+          <span class="text-xs text-gray-400">Livraison en 30 min</span>
+        </div>
+        <div class="w-px h-4 bg-white/10 hidden sm:block"></div>
+        <div class="flex items-center gap-2 text-gray-500">
+          <span class="text-sm">📍</span>
+          <span class="text-xs text-gray-400">Canteleu</span>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="text-center mt-10 md:mt-14 animate-fadeInUp stagger-5">
+        <a href="#pizzas" class="inline-flex flex-col items-center gap-2 text-gray-600 hover:text-gold transition-colors">
+          <span class="text-xs tracking-widest uppercase">Découvrir</span>
+          <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M19 14l-7 7m0 0l-7-7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PIZZAS ===================== -->
+  <div class="section-divider"></div>
+  <section id="pizzas" class="py-16 md:py-24 dark-section section-reveal relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-tomato-500/5 blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-basil-500/5 blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-4">
+          <span class="text-sm">🔥</span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Nos Spécialités</span>
+        </div>
+        <h2 class="font-display text-3xl md:text-5xl font-bold mt-3 text-white">Nos <span class="gold-shine">Pizzas</span></h2>
+        <div class="section-title-line"></div>
+        <p class="text-gray-500 mt-4 max-w-lg mx-auto">Pâte pétrie à la main, cuisson au feu de bois, ingrédients premium.</p>
+        <!-- Size selector -->
+        <div class="flex items-center justify-center gap-3 mt-6">
+          <button onclick="setSize('senior')" id="btn-senior" class="size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-tomato-500 to-tomato-700 text-white shadow-lg shadow-tomato-500/20">Senior 33cm — 19€</button>
+          <button onclick="setSize('mega')" id="btn-mega" class="size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10">Mega 40cm — 26€</button>
+        </div>
+        <p class="text-xs text-gold mt-3 font-medium">1 pizza achetée = 1 pizza offerte à emporter !</p>
+      </div>
+      <!-- Base Tomate -->
+      <h3 class="font-display text-xl font-bold text-white mb-5 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-tomato-500/20 border border-tomato-500/30 flex items-center justify-center text-sm">🍅</span> Base Tomate</h3>
+      <div id="pizzaTomateGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12"></div>
+      <!-- Base Crème -->
+      <h3 class="font-display text-xl font-bold text-white mb-5 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-crust-200/20 border border-crust-200/30 flex items-center justify-center text-sm">🧈</span> Base Crème</h3>
+      <div id="pizzaCremeGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
+    </div>
+  </section>
+
+  <!-- ===================== MENUS ===================== -->
+  <div class="section-divider"></div>
+  <section id="menus" class="py-16 md:py-24 dark-section-alt section-reveal relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-basil-500/5 blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-4">
+          <span class="text-sm">🍽️</span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Formules Complètes</span>
+        </div>
+        <h2 class="font-display text-3xl md:text-5xl font-bold mt-3 text-white">Nos <span class="gold-shine">Menus</span></h2>
+        <div class="section-title-line"></div>
+        <p class="text-gray-500 mt-4 max-w-lg mx-auto">La formule idéale pour se régaler.</p>
+      </div>
+      <div id="menuGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"></div>
+    </div>
+  </section>
+
+  <!-- ===================== BOISSONS ===================== -->
+  <div class="section-divider"></div>
+  <section id="boissons" class="py-16 md:py-24 dark-section section-reveal relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-4">
+          <span class="text-sm">🥤</span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Rafraîchissements</span>
+        </div>
+        <h2 class="font-display text-3xl md:text-5xl font-bold mt-3 text-white">Nos <span class="gold-shine">Boissons</span></h2>
+        <div class="section-title-line"></div>
+      </div>
+      <div id="boissonGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6"></div>
+    </div>
+  </section>
+
+  <!-- ===================== AVIS ===================== -->
+  <div class="section-divider"></div>
+  <section id="avis" class="py-16 md:py-24 dark-section-alt section-reveal relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute bottom-0 left-1/4 w-[500px] h-[300px] rounded-full bg-gold/5 blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-4">
+          <span class="text-sm">⭐</span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Témoignages</span>
+        </div>
+        <h2 class="font-display text-3xl md:text-5xl font-bold mt-3 text-white">Ce que disent <span class="gold-shine">nos clients</span></h2>
+        <div class="section-title-line"></div>
+        <div class="flex items-center justify-center gap-2 mt-5">
+          <div class="flex gap-1">${'<span class="star text-xl">★</span>'.repeat(5)}</div>
+          <span class="text-gray-400 font-medium text-sm">4.9/5 — 350+ avis</span>
+        </div>
+      </div>
+      <div id="avisGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <div class="section-divider"></div>
+  <footer class="bg-[#050505] text-gray-300 pt-16 pb-8 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[200px] rounded-full bg-tomato-500/5 blur-3xl"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <!-- Brand -->
+        <div class="sm:col-span-2 lg:col-span-1">
+          <a href="#hero" class="flex items-center gap-2 mb-4">
+            <img src="logo.webp" onerror="this.src='logo.png'" alt="Pizza Yolo" class="h-14 w-auto object-contain drop-shadow-lg">
+          </a>
+          <p class="text-sm text-gray-500 leading-relaxed">Votre pizzeria à Canteleu. Des pizzas généreuses, fraîches et savoureuses, à emporter ou en livraison.</p>
+        </div>
+        <!-- Adresse -->
+        <div>
+          <h4 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Nous trouver</h4>
+          <address class="not-italic text-sm leading-relaxed text-gray-400">
+            42 Avenue de Versailles<br>76380 Canteleu, France<br><br>
+            <a href="tel:+33235083338" class="hover:text-white transition-colors">02 35 08 33 38</a>
+          </address>
+        </div>
+        <!-- Horaires -->
+        <div>
+          <h4 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Horaires</h4>
+          <ul class="text-sm space-y-2 text-gray-400">
+            <li class="flex justify-between"><span>Lundi</span><span class="text-white">18h30 — 22h30</span></li>
+            <li class="flex justify-between"><span>Mar — Mer</span><span class="text-white">18h — 22h30</span></li>
+            <li class="flex justify-between"><span>Jeu — Dim</span><span class="text-white">18h — 22h30</span></li>
+          </ul>
+          <p class="text-xs text-gray-500 mt-3">Livraison jusqu'à 30 min avant fermeture</p>
+        </div>
+        <!-- Réseaux -->
+        <div>
+          <h4 class="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Suivez-nous</h4>
+          <div class="flex gap-3">
+            <a href="https://www.instagram.com/pizza.yolo_/" target="_blank" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-tomato-500 flex items-center justify-center transition-colors" aria-label="Instagram">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-coal-800 flex items-center justify-center transition-colors" aria-label="TikTok">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46V13a8.28 8.28 0 005.58 2.16V11.7a4.83 4.83 0 01-3.77-1.75v-.01z"/></svg>
+            </a>
+            <a href="https://www.facebook.com/pizzayolo.co/" target="_blank" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors" aria-label="Facebook">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+          </div>
+          <div class="mt-6">
+            <a href="#hero" class="inline-flex items-center gap-2 text-sm text-tomato-500 hover:text-tomato-400 transition-colors font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+              Retour en haut
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-8 text-center text-xs text-gray-500">
+        <p>&copy; 2026 Pizza Yolo — Tous droits réservés. Fait avec ❤️ à Canteleu.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== CART SLIDE-IN ===================== -->
+  <div id="cartOverlay" class="fixed inset-0 z-[60] overlay-bg hidden" onclick="toggleCart()"></div>
+  <aside id="cartPanel" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white z-[70] shadow-2xl hidden flex-col">
+    <div class="p-5 border-b border-gray-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display text-xl font-bold flex items-center gap-2">
+          <svg class="w-5 h-5 text-tomato-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+          Votre Panier
+        </h3>
+        <button onclick="toggleCart()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" aria-label="Fermer le panier">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <!-- Mode selector: emporter / livraison -->
+      <div id="orderModeSelector" class="flex rounded-xl bg-gray-100 p-1 gap-1">
+        <button onclick="setOrderMode('emporter')" id="modeEmporter" class="order-mode-btn flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-white text-coal-900 shadow-sm">
+          <span>🏪</span> À emporter
+        </button>
+        <button onclick="setOrderMode('livraison')" id="modeLivraison" class="order-mode-btn flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 text-gray-500">
+          <span>🛵</span> Livraison
+        </button>
+      </div>
+      <div id="promoHint" class="mt-3 text-center">
+        <p class="text-xs font-semibold text-basil-600 bg-basil-50 rounded-lg py-2 px-3 flex items-center justify-center gap-1.5">
+          <span>🎉</span>
+          <span id="promoHintText">1 pizza achetée = 1 OFFERTE !</span>
+        </p>
+      </div>
+    </div>
+    <div id="cartBody" class="cart-body flex-1 overflow-y-auto p-5">
+      <div id="cartEmpty" class="flex flex-col items-center justify-center h-full text-center py-12">
+        <span class="text-6xl mb-4">🛒</span>
+        <p class="text-gray-400 font-medium">Votre panier est vide</p>
+        <p class="text-gray-300 text-sm mt-1">Ajoutez de délicieuses pizzas !</p>
+      </div>
+      <div id="cartItems" class="space-y-3 hidden"></div>
+    </div>
+    <div id="cartFooter" class="border-t border-gray-100 p-5 hidden">
+      <div id="cartTotalSection">
+        <div class="flex justify-between items-center mb-5">
+          <span class="text-gray-500 font-medium">Total</span>
+          <span id="cartTotal" class="font-display text-2xl font-bold text-coal-900">0,00 €</span>
+        </div>
+      </div>
+      <!-- Payment buttons -->
+      <div class="space-y-3">
+        <button onclick="showPaymentConfirm('apple')" class="w-full flex items-center justify-center gap-3 bg-black text-white rounded-xl py-3.5 font-semibold hover:bg-gray-800 transition-colors text-sm">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.89 4.27-3.74 4.25z"/></svg>
+          Payer avec Apple Pay
+        </button>
+        <button onclick="showPaymentConfirm('google')" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-coal-800 rounded-xl py-3.5 font-semibold hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Payer avec Google Pay
+        </button>
+        <div class="relative flex items-center my-2">
+          <div class="flex-1 border-t border-gray-200"></div>
+          <span class="px-4 text-xs text-gray-400 uppercase">ou</span>
+          <div class="flex-1 border-t border-gray-200"></div>
+        </div>
+        <button onclick="showPaymentConfirm('card')" class="w-full flex items-center justify-center gap-3 bg-tomato-500 text-white rounded-xl py-3.5 font-semibold hover:bg-tomato-600 transition-colors text-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Payer par Carte Bancaire
+        </button>
+        <div class="flex items-center justify-center gap-4 mt-3 text-xs text-gray-400">
+          <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            Paiement sécurisé
+          </span>
+          <span>SSL 256-bit</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== UPSELL MODAL ===================== -->
+  <!-- ===================== SUPPLEMENT MODAL ===================== -->
+  <div id="suppOverlay" class="fixed inset-0 z-[75] overlay-bg hidden flex items-end sm:items-center justify-center p-4" onclick="if(event.target===this)closeSuppModal()">
+    <div class="bg-white rounded-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-modalIn">
+      <div class="p-5">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-display text-lg font-bold text-coal-900">Personnalise ta pizza</h3>
+            <p id="suppPizzaName" class="text-sm text-gray-500"></p>
+          </div>
+          <button onclick="closeSuppModal()" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <p class="text-xs text-gray-400 mb-4">Chaque supplément : <span class="font-bold text-gold">1,50 €</span></p>
+
+        <!-- Supplement categories -->
+        <div id="suppCategories" class="space-y-4 mb-5"></div>
+
+        <!-- Total supplements -->
+        <div id="suppTotalBar" class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 mb-4 flex items-center justify-between">
+          <span class="text-sm font-semibold text-coal-800">Suppléments :</span>
+          <span id="suppTotalPrice" class="font-bold text-gold">+0,00 €</span>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex gap-3">
+          <button onclick="confirmSuppModal(false)" class="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-coal-800 hover:bg-gray-50 transition-colors">
+            Sans supplément
+          </button>
+          <button onclick="confirmSuppModal(true)" class="flex-1 py-3 rounded-xl bg-tomato-500 text-white text-sm font-semibold hover:bg-tomato-600 transition-colors">
+            Ajouter au panier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="upsellOverlay" class="fixed inset-0 z-[80] overlay-bg hidden flex items-end sm:items-center justify-center p-4">
+    <div id="upsellModal" class="bg-white rounded-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div class="p-6">
+        <!-- Success icon -->
+        <div class="flex items-center justify-center w-14 h-14 bg-basil-50 rounded-full mx-auto mb-4">
+          <svg class="w-7 h-7 text-basil-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-center mb-1">Ajouté au panier !</h3>
+        <p id="upsellItemName" class="text-center text-gray-500 text-sm mb-6"></p>
+
+        <div class="bg-crust-50 rounded-xl p-4 mb-5">
+          <p class="font-semibold text-sm text-coal-800 mb-3 flex items-center gap-2">
+            <span>✨</span> Accompagnez votre pizza !
+          </p>
+          <div id="upsellSuggestions" class="space-y-2"></div>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="closeUpsell()" class="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-coal-800 hover:bg-gray-50 transition-colors">
+            Continuer
+          </button>
+          <button onclick="closeUpsell();toggleCart()" class="flex-1 py-3 rounded-xl bg-tomato-500 text-white text-sm font-semibold hover:bg-tomato-600 transition-colors">
+            Voir le panier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAYMENT MODAL ===================== -->
+  <div id="payOverlay" class="fixed inset-0 z-[90] overlay-bg hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-8 text-center animate-modalIn shadow-2xl">
+      <div class="flex items-center justify-center w-16 h-16 bg-basil-50 rounded-full mx-auto mb-4">
+        <svg class="w-8 h-8 text-basil-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h3 class="font-display text-2xl font-bold mb-2">Merci !</h3>
+      <p id="payMsg" class="text-gray-500 text-sm mb-6"></p>
+      <button onclick="closePayment()" class="w-full py-3 rounded-xl bg-coal-900 text-white font-semibold hover:bg-coal-800 transition-colors text-sm">Fermer</button>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST ===================== -->
+  <div id="toast" class="toast">
+    <div class="glass-dark text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-semibold border border-white/10">
+      <span class="text-xl" id="toastEmoji">🍕</span>
+      <span id="toastText">Ajouté au panier !</span>
+    </div>
+  </div>
+
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <script>
+    // ——— PIZZA SIZES & PRICES ———
+    const sizePrices = { senior:19, mega:26 };
+    let currentSize = 'senior';
+
+    // ——— DATA : PIZZAS BASE TOMATE ———
+    const pizzasTomate = [
+      { id:'pt1',  name:'Margherita',      desc:'Tomate, mozzarella, olives', emoji:'🍕', tag:'Classique', img:'base tomate/web/MARGHERITA.webp' },
+      { id:'pt2',  name:'4 Fromages',      desc:'Tomate, mozzarella, emmental, bleu, chèvre', emoji:'🧀', tag:'Gourmand', img:'base tomate/web/4 FROMAGES.webp' },
+      { id:'pt3',  name:'Bolognaise',      desc:'Tomate, mozzarella, viande hachée, oignons', emoji:'🍝', tag:'', img:'base tomate/web/BOLOGNAISE.webp' },
+      { id:'pt4',  name:'Reine',           desc:'Tomate, mozzarella, jambon de dinde, champignons', emoji:'👑', tag:'Populaire', img:'base tomate/web/REINE.webp' },
+      { id:'pt5',  name:'Chicken',         desc:'Tomate, mozzarella, poulet, oignons, pomme de terre, olives, champignons', emoji:'🍗', tag:'', img:'base tomate/web/CHICKEN.webp' },
+      { id:'pt6',  name:'Regina',          desc:'Tomate, mozzarella, merguez, chorizo, olives, champignons', emoji:'🔥', tag:'Épicé', img:'base tomate/web/REGINA.webp' },
+      { id:'pt7',  name:'Kebab',           desc:'Tomate, mozzarella, viande kebab, poivrons, oignons', emoji:'🥙', tag:'', img:'base tomate/web/KEBAB.webp' },
+      { id:'pt8',  name:'Tonnarella',      desc:'Tomate, mozzarella, poivrons, tomate fraîche, thon', emoji:'🐟', tag:'', img:'base tomate/web/TONNARELLA.webp' },
+      { id:'pt9',  name:'Calzone',         desc:'Tomate, mozzarella, viande hachée, lardons, pomme de terre, oeuf', emoji:'🥟', tag:'' },
+      { id:'pt10', name:'Campagnarde',     desc:'Tomate, mozzarella, lardons, olives, oignons, oeuf', emoji:'🌾', tag:'', img:'base creme/web/CAMPAGNARDE.webp' },
+      { id:'pt11', name:'Norvégienne',     desc:'Tomate, mozzarella, saumon fumé, olives', emoji:'🐠', tag:'', img:'base creme/web/NORVEGIENNE.webp' },
+      { id:'pt12', name:'Méditerranéenne', desc:'Tomate, mozzarella, thon, poivrons, oignons', emoji:'🌊', tag:'', img:'base creme/web/MEDITERRANEENNE.webp' },
+      { id:'pt13', name:'Spéciale VH',    desc:'Tomate, mozzarella, pomme de terre, oignons, poivrons', emoji:'🎯', tag:'', img:'base tomate/web/SPECIALE VH.webp' },
+    ];
+
+    // ——— DATA : PIZZAS BASE CRÈME ———
+    const pizzasCreme = [
+      { id:'pc1',  name:'Orientale',        desc:'Crème fraîche, mozzarella, merguez, poivrons', emoji:'🌙', tag:'', img:'base tomate/web/ORIENTAL.webp' },
+      { id:'pc2',  name:'Cantilienne',      desc:'Crème fraîche, mozzarella, viande hachée, dinde, oeuf', emoji:'🏰', tag:'', img:'base tomate/web/CANTILIENNE.webp' },
+      { id:'pc3',  name:'Buffalo',          desc:'Crème fraîche, mozzarella, viande hachée, poivrons', emoji:'🦬', tag:'', img:'base tomate/web/BUFFALO.webp' },
+      { id:'pc4',  name:'Mexicaine',        desc:'Crème fraîche, mozzarella, viande hachée, chorizo, sauce barbecue, poivrons', emoji:'🌮', tag:'Épicé', img:'base tomate/web/MEXICAINE.webp' },
+      { id:'pc5',  name:'4 Saisons',        desc:'Crème fraîche, mozzarella, olives, champignons, poivrons, artichauts', emoji:'🍂', tag:'', img:'base tomate/web/4 SAISONS.webp' },
+      { id:'pc6',  name:'Trabzon',          desc:'Crème fraîche, mozzarella, emmental, sucuk, cheddar, pomme de terre', emoji:'🇹🇷', tag:'', img:'base tomate/web/TRABZON.webp' },
+      { id:'pc7',  name:'Ankara',           desc:'Crème fraîche, mozzarella, sucuk, cheddar', emoji:'🇹🇷', tag:'', img:'base tomate/web/ANKARA.webp' },
+      { id:'pc9',  name:'Fermière',         desc:'Crème fraîche, mozzarella, jambon, champignons', emoji:'🏡', tag:'', img:'base creme/web/FERMIERE.webp' },
+      { id:'pc10', name:'Western',          desc:'Crème fraîche, mozzarella, poulet, oignons, grains, oeuf', emoji:'🤠', tag:'', img:'base creme/web/WESTERN.webp' },
+      { id:'pc11', name:'Suprême Chicken',  desc:'Crème fraîche, mozzarella, poulet, miel, curry', emoji:'⭐', tag:'Populaire', img:'base creme/web/SUPREME CHICKEN.webp' },
+      { id:'pc12', name:'Indienne',         desc:'Crème fraîche, mozzarella, poulet, oignons, poivrons', emoji:'🍛', tag:'', img:'base creme/web/INDIENNE.webp' },
+      { id:'pc13', name:'Tartiflette',      desc:'Crème fraîche, mozzarella, lardons, pommes de terre, reblochon', emoji:'🧅', tag:'Gourmand', img:'base creme/web/TARTIFLETTE.webp' },
+      { id:'pc14', name:'Savoyarde',        desc:'Crème fraîche, mozzarella, jambon de dinde, fromage à raclette', emoji:'🏔️', tag:'', img:'base creme/web/SAVOYARDE.webp' },
+      { id:'pc15', name:'Paysanne',         desc:'Crème fraîche, mozzarella, jambon, champignons', emoji:'🌿', tag:'', img:'base creme/web/PAYSAGE.webp' },
+      { id:'pc16', name:'Chèvre Miel',      desc:'Crème fraîche, mozzarella, chèvre, miel', emoji:'🍯', tag:'', img:'base creme/web/CHEVRE MIEL.webp' },
+      { id:'pc17', name:'Gourmandise',      desc:'Crème fraîche, mozzarella, viande hachée, poulet, emmental', emoji:'😋', tag:'', img:'base creme/web/GOURMANDISE.webp' },
+      { id:'pc18', name:'Montagnarde',      desc:'Crème fraîche, mozzarella, lardons, reblochon, champignons', emoji:'⛰️', tag:'Gourmand', img:'base creme/web/MONTAGNARDE.webp' },
+      { id:'pc19', name:'Burger',           desc:'Crème fraîche, mozzarella, viande hachée, cornichons, cheddar', emoji:'🍔', tag:'Best-seller', img:'base creme/web/BURGER.webp' },
+      { id:'pc20', name:'Boursin',          desc:'Crème fraîche, mozzarella, boursin, lardons', emoji:'🧈', tag:'', img:'base creme/web/BOURSIN.webp' },
+    ];
+
+    // ——— DATA : SUPPLÉMENTS (1,50 € chacun) ———
+    const SUPPLEMENT_PRICE = 1.50;
+    const supplements = {
+      viandes: [
+        'Poulet', 'Viande hachée', 'Merguez', 'Chorizo', 'Lardons',
+        'Jambon de dinde', 'Viande kebab', 'Dinde', 'Sucuk', 'Thon', 'Saumon fumé'
+      ],
+      fromages: [
+        'Mozzarella', 'Emmental', 'Cheddar', 'Chèvre', 'Bleu',
+        'Reblochon', 'Boursin', 'Raclette', 'Parmesan'
+      ],
+      legumes: [
+        'Champignons', 'Poivrons', 'Oignons', 'Olives', 'Tomate fraîche',
+        'Pomme de terre', 'Artichauts', 'Cornichons', 'Roquette', 'Oeuf'
+      ]
+    };
+    const suppCategoryLabels = { viandes: '🥩 Viandes', fromages: '🧀 Fromages', legumes: '🥬 Légumes' };
+
+    // ——— DATA : MENUS ———
+    const menus = [
+      { id:'m1', name:'Menu Solo',   desc:'1 Senior au choix + 1 boisson 33cl', price:21, emoji:'🍽️' },
+      { id:'m2', name:'Menu Duo',    desc:'2 Senior au choix + 2 boissons 33cl', price:39, emoji:'👫' },
+      { id:'m3', name:'Menu Family', desc:'1 Mega + 1 Senior + 1 boisson 1,5L', price:47, emoji:'👨‍👩‍👧‍👦' },
+    ];
+
+    // ——— DATA : BOISSONS ———
+    const boissons = [
+      { id:'b1', name:'Canette 33cl',     desc:'Coca, Fanta, Sprite, Oasis, Perrier...', price:1.50, emoji:'🥤', img:'BOISSON/web/canette 33cl.webp' },
+      { id:'b2', name:'Bouteille Coca',   desc:'Coca-Cola 1,5L', price:3, emoji:'🍾', img:'BOISSON/web/COCA.webp' },
+      { id:'b3', name:'Oasis 2L',         desc:'Tropical ou Pomme-Cassis', price:3.50, emoji:'🍊', img:'BOISSON/web/OASIS.webp' },
+      { id:'b4', name:'Eau 50cl',         desc:'Cristaline', price:1, emoji:'💧', img:'BOISSON/web/EAU.webp' },
+    ];
+
+    // ——— DATA : AVIS ———
+    const avis = [
+      { name:'Sophie M.', text:'Meilleures pizzas du quartier ! La pâte est incroyable. La Montagnarde est une tuerie avec le reblochon. On revient chaque semaine.', stars:5, date:'Il y a 2 jours' },
+      { name:'Thomas R.', text:'Livraison rapide, pizzas encore brûlantes. La Calzone est énorme et bien garnie. Service au top !', stars:5, date:'Il y a 1 semaine' },
+      { name:'Emma L.', text:'Super rapport qualité-prix avec l\'offre 1 achetée = 1 offerte. On s\'est régalés en famille !', stars:5, date:'Il y a 3 jours' },
+      { name:'Lucas D.', text:'La Regina est parfaite pour les amateurs de piquant. Merguez + chorizo, combo parfait. Je recommande à 100%.', stars:5, date:'Il y a 5 jours' },
+      { name:'Marie P.', text:'Le menu Family est idéal pour les soirées entre amis. Généreux, savoureux et livré en 25 minutes !', stars:4, date:'Il y a 1 semaine' },
+      { name:'Antoine B.', text:'Première commande et déjà conquis. La Burger pizza fond en bouche. Le paiement est rapide et simple.', stars:5, date:'Il y a 4 jours' },
+    ];
+
+    // ——— ALL ITEMS (flat list for cart lookup) ———
+    function getAllItems() {
+      const p = sizePrices[currentSize];
+      return [
+        ...pizzasTomate.map(i=>({...i, price:p})),
+        ...pizzasCreme.map(i=>({...i, price:p})),
+        ...menus, ...boissons
+      ];
+    }
+
+    // ——— ORDER MODE & PROMO ———
+    let orderMode = 'emporter'; // 'emporter' or 'livraison'
+
+    function setOrderMode(mode) {
+      orderMode = mode;
+      // Update selector UI
+      document.querySelectorAll('.order-mode-btn').forEach(b => {
+        b.classList.remove('bg-white','text-coal-900','shadow-sm');
+        b.classList.add('text-gray-500');
+      });
+      const active = mode === 'emporter' ? document.getElementById('modeEmporter') : document.getElementById('modeLivraison');
+      active.classList.add('bg-white','text-coal-900','shadow-sm');
+      active.classList.remove('text-gray-500');
+      // Update promo hint
+      const hintText = document.getElementById('promoHintText');
+      if(mode === 'emporter') {
+        hintText.textContent = '1 pizza achetée = 1 OFFERTE !';
+      } else {
+        hintText.textContent = '1 pizza achetée, la 2ème à -50% !';
+      }
+      updateCartUI();
+    }
+
+    // Calculate promo discount for pizzas
+    function getPromoDiscount() {
+      // Get all pizza items in cart, expanded by qty
+      const pizzaItems = [];
+      cart.forEach(c => {
+        if(c.type === 'pizza') {
+          for(let i = 0; i < c.qty; i++) {
+            pizzaItems.push({ id: c.id, price: c.price });
+          }
+        }
+      });
+
+      if(pizzaItems.length < 2) return { discount: 0, details: [] };
+
+      // Sort by price descending (most expensive first)
+      pizzaItems.sort((a, b) => b.price - a.price);
+
+      let discount = 0;
+      const details = []; // tracks which items get discount
+
+      if(orderMode === 'emporter') {
+        // Every 2nd pizza is FREE (cheapest of each pair)
+        // Pair them: 1st full, 2nd free, 3rd full, 4th free...
+        for(let i = 0; i < pizzaItems.length; i++) {
+          if(i % 2 === 1) {
+            discount += pizzaItems[i].price;
+            details.push({ id: pizzaItems[i].id, saved: pizzaItems[i].price, label: 'OFFERTE' });
+          }
+        }
+      } else {
+        // Livraison: every 2nd pizza at -50%
+        for(let i = 0; i < pizzaItems.length; i++) {
+          if(i % 2 === 1) {
+            const saved = pizzaItems[i].price * 0.5;
+            discount += saved;
+            details.push({ id: pizzaItems[i].id, saved, label: '-50%' });
+          }
+        }
+      }
+
+      return { discount, details };
+    }
+
+    // ——— CART STATE ———
+    let cart = [];
+
+    // ——— SIZE SELECTOR ———
+    function setSize(size) {
+      currentSize = size;
+      document.querySelectorAll('.size-btn').forEach(b=>{
+        b.className = 'size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10';
+      });
+      const active = document.getElementById('btn-'+size);
+      active.className = 'size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-tomato-500 to-tomato-700 text-white shadow-lg shadow-tomato-500/20 border-0';
+      renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid');
+      renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid');
+    }
+
+    // ——— RENDER PIZZA GRID ———
+    function renderPizzaGrid(items, gridId) {
+      const grid = document.getElementById(gridId);
+      const price = sizePrices[currentSize];
+      grid.innerHTML = items.map((p,i) => `
+        <div class="product-card card-reveal rounded-2xl overflow-hidden group text-center" style="transition-delay:${i*0.06}s">
+          <div class="pt-6 pb-3 px-4 relative">
+            ${p.tag ? `<span class="absolute top-3 right-3 text-white text-[10px] font-bold px-2.5 py-1 rounded-full tag-badge z-10 uppercase tracking-wider">${p.tag}</span>` : ''}
+            <div class="relative inline-block">
+              <div class="pizza-glow"></div>
+              ${p.img
+                ? `<div class="pizza-img-wrap"><div class="pizza-ring"></div><img src="${p.img}" alt="${p.name}" loading="lazy"></div>`
+                : `<div class="pizza-img-wrap flex items-center justify-center bg-gradient-to-br from-white/10 to-white/5"><span class="text-6xl card-emoji drop-shadow-lg">${p.emoji}</span></div>`
+              }
+            </div>
+          </div>
+          <div class="px-5 pb-5 pt-1 relative z-10">
+            <h3 class="font-display text-base font-bold text-white mb-0.5">${p.name}</h3>
+            <span class="font-bold text-lg price-tag">${price.toFixed(2).replace('.',',')} €</span>
+            <p class="text-gray-500 text-xs leading-relaxed mt-2 mb-4 min-h-[2.5rem]">${p.desc}</p>
+            <button onclick="handleAddClick(event);openSuppModal('${p.id}')" class="btn-add w-full py-2.5 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+              Ajouter
+            </button>
+          </div>
+        </div>
+      `).join('');
+      observeCards(grid);
+    }
+
+    // ——— RENDER MENUS ———
+    function renderMenus() {
+      const grid = document.getElementById('menuGrid');
+      grid.innerHTML = menus.map((m,i) => `
+        <div class="product-card card-reveal rounded-2xl overflow-hidden" style="transition-delay:${i*0.1}s">
+          <div class="bg-gradient-to-br from-basil-500/10 to-basil-500/5 p-6 text-center">
+            <span class="text-5xl card-emoji inline-block drop-shadow-lg">${m.emoji}</span>
+          </div>
+          <div class="p-4 relative z-10">
+            <div class="flex items-start justify-between mb-1.5">
+              <h3 class="font-display text-base font-bold text-white">${m.name}</h3>
+              <span class="font-bold text-gold whitespace-nowrap ml-2 price-tag">${m.price.toFixed(2).replace('.',',')} €</span>
+            </div>
+            <p class="text-gray-500 text-xs leading-relaxed mb-3">${m.desc}</p>
+            <button onclick="handleAddClick(event);addToCart('${m.id}','menu')" class="btn-add w-full py-2.5 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#2E7D32,#1B5E20)">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+              Ajouter
+            </button>
+          </div>
+        </div>
+      `).join('');
+      observeCards(grid);
+    }
+
+    // ——— RENDER SMALL GRID ———
+    function renderSmallGrid(items, gridId, type, color) {
+      const grid = document.getElementById(gridId);
+      grid.innerHTML = items.map((i,idx) => `
+        <div class="product-card card-reveal rounded-2xl flex flex-col overflow-hidden group text-center" style="transition-delay:${idx*0.05}s">
+          <div class="pt-4 pb-2 px-4">
+            ${i.img
+              ? `<div class="w-24 h-24 mx-auto rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/5 transition-transform duration-500 group-hover:scale-105"><img src="${i.img}" alt="${i.name}" class="w-full h-full object-contain" loading="lazy"></div>`
+              : `<div class="text-4xl mb-1 card-emoji inline-block drop-shadow-lg">${i.emoji}</div>`
+            }
+          </div>
+          <div class="px-4 pb-4 flex flex-col flex-1">
+            <h3 class="font-display font-bold text-sm text-white">${i.name}</h3>
+            <p class="text-gray-500 text-xs leading-relaxed mt-1 mb-3 flex-1">${i.desc}</p>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-gold price-tag">${i.price.toFixed(2).replace('.',',')} €</span>
+              <button onclick="handleAddClick(event);addToCart('${i.id}','${type}')" class="btn-add p-2 rounded-lg text-white" aria-label="Ajouter ${i.name}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      observeCards(grid);
+    }
+
+    // ——— RENDER AVIS ———
+    function renderAvis() {
+      const grid = document.getElementById('avisGrid');
+      grid.innerHTML = avis.map((a,i) => `
+        <div class="avis-card card-reveal rounded-2xl p-6" style="transition-delay:${i*0.1}s">
+          <div class="flex items-center gap-1 mb-3">
+            ${Array.from({length:a.stars},(_,j)=>`<span class="star text-lg star-animated" style="animation-delay:${j*0.1+0.3}s">★</span>`).join('')}${Array.from({length:5-a.stars},()=>'<span class="text-gray-700 text-lg">★</span>').join('')}
+          </div>
+          <p class="text-gray-400 text-sm leading-relaxed mb-4">"${a.text}"</p>
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-sm text-white">${a.name}</span>
+            <span class="text-xs text-gray-600">${a.date}</span>
+          </div>
+        </div>
+      `).join('');
+      observeCards(grid);
+    }
+
+    // ——— FIND ITEM ———
+    function findItem(id) {
+      return getAllItems().find(i=>i.id===id);
+    }
+
+    // ——— ADD PIZZA (with current size) ———
+    function addPizzaToCart(id) {
+      const allPizzas = [...pizzasTomate,...pizzasCreme];
+      const pizza = allPizzas.find(p=>p.id===id);
+      if(!pizza) return;
+      const price = sizePrices[currentSize];
+      const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
+      const cartId = id+'_'+currentSize;
+      const existing = cart.find(c=>c.id===cartId);
+      if(existing) { existing.qty++; }
+      else { cart.push({ id:cartId, name:pizza.name+' ('+sizeLabel+')', desc:pizza.desc, price, emoji:pizza.emoji, qty:1, type:'pizza' }); }
+      updateCartUI();
+      showUpsell({ name:pizza.name+' '+sizeLabel, price, emoji:pizza.emoji });
+    }
+
+    // ——— CART LOGIC ———
+    function addToCart(id, type) {
+      const item = findItem(id);
+      if(!item) return;
+      const existing = cart.find(c=>c.id===id);
+      if(existing) { existing.qty++; }
+      else { cart.push({...item, qty:1, type}); }
+      updateCartUI();
+      if(type === 'pizza' || type === 'menu') showUpsell(item);
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(c=>c.id!==id);
+      updateCartUI();
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(c=>c.id===id);
+      if(!item) return;
+      item.qty += delta;
+      if(item.qty <= 0) cart = cart.filter(c=>c.id!==id);
+      updateCartUI();
+    }
+
+    function getTotal() {
+      return cart.reduce((sum,c)=>sum+c.price*c.qty,0);
+    }
+
+    function updateCartUI() {
+      const badge = document.getElementById('cartBadge');
+      const totalItems = cart.reduce((s,c)=>s+c.qty,0);
+      if(totalItems > 0) {
+        badge.textContent = totalItems;
+        badge.classList.remove('hidden');
+        badge.classList.add('animate-badgePop');
+        setTimeout(()=>badge.classList.remove('animate-badgePop'),400);
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      const empty = document.getElementById('cartEmpty');
+      const items = document.getElementById('cartItems');
+      const footer = document.getElementById('cartFooter');
+
+      if(cart.length === 0) {
+        empty.classList.remove('hidden');
+        items.classList.add('hidden');
+        footer.classList.add('hidden');
+      } else {
+        empty.classList.add('hidden');
+        items.classList.remove('hidden');
+        footer.classList.remove('hidden');
+
+        const promo = getPromoDiscount();
+        const pizzaCount = cart.filter(c=>c.type==='pizza').reduce((s,c)=>s+c.qty,0);
+
+        items.innerHTML = cart.map(c=>`
+          <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
+            <span class="text-2xl flex-shrink-0">${c.emoji}</span>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-coal-900 truncate">${c.name}</p>
+              ${c.supps && c.supps.length > 0 ? `<p class="text-[10px] text-amber-600 font-medium truncate">+ ${c.supps.join(', ')}</p>` : ''}
+              <p class="text-xs text-gray-400">${c.price.toFixed(2).replace('.',',')} € × ${c.qty}</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="changeQty('${c.id}',-1)" class="w-7 h-7 rounded-lg bg-white border border-gray-200 text-sm font-bold hover:bg-gray-100 transition-colors flex items-center justify-center">−</button>
+              <span class="w-7 text-center text-sm font-semibold">${c.qty}</span>
+              <button onclick="changeQty('${c.id}',1)" class="w-7 h-7 rounded-lg bg-white border border-gray-200 text-sm font-bold hover:bg-gray-100 transition-colors flex items-center justify-center">+</button>
+            </div>
+            <button onclick="removeFromCart('${c.id}')" class="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-tomato-500 transition-colors" aria-label="Supprimer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `).join('');
+
+        // Promo banner in cart
+        const promoEl = document.getElementById('cartPromo');
+        if(promoEl) promoEl.remove();
+
+        if(promo.discount > 0) {
+          const promoLabel = orderMode === 'emporter' ? '1 achetée = 1 offerte' : '2ème pizza à -50%';
+          const promoHTML = `
+            <div id="cartPromo" class="mt-3 bg-gradient-to-r from-basil-50 to-emerald-50 border border-basil-200 rounded-xl p-3 animate-fadeInUp">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">🎉</span>
+                  <div>
+                    <p class="text-xs font-bold text-basil-700 uppercase tracking-wide">Promo ${orderMode === 'emporter' ? 'À emporter' : 'Livraison'}</p>
+                    <p class="text-xs text-basil-600">${promoLabel}</p>
+                  </div>
+                </div>
+                <span class="font-bold text-basil-700 text-sm">-${promo.discount.toFixed(2).replace('.',',')} €</span>
+              </div>
+            </div>`;
+          items.insertAdjacentHTML('beforeend', promoHTML);
+        } else if(pizzaCount === 1) {
+          const tip = orderMode === 'emporter' ? 'Ajoutez 1 pizza pour avoir la 2ème OFFERTE !' : 'Ajoutez 1 pizza pour avoir la 2ème à -50% !';
+          const tipHTML = `
+            <div id="cartPromo" class="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 animate-fadeInUp">
+              <p class="text-xs font-semibold text-amber-700 flex items-center gap-2">
+                <span class="text-base">💡</span> ${tip}
+              </p>
+            </div>`;
+          items.insertAdjacentHTML('beforeend', tipHTML);
+        }
+
+        const subtotal = getTotal();
+        const total = subtotal - promo.discount;
+
+        // Show subtotal + discount + total
+        const footerContent = document.getElementById('cartFooter');
+        let totalHTML = '';
+        if(promo.discount > 0) {
+          totalHTML = `
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-gray-400 text-sm">Sous-total</span>
+              <span class="text-gray-400 text-sm">${subtotal.toFixed(2).replace('.',',')} €</span>
+            </div>
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-basil-600 text-sm font-semibold flex items-center gap-1">🎉 Réduction promo</span>
+              <span class="text-basil-600 text-sm font-semibold">-${promo.discount.toFixed(2).replace('.',',')} €</span>
+            </div>
+            <div class="flex justify-between items-center mb-5 pt-2 border-t border-gray-100">
+              <span class="text-coal-900 font-bold">Total</span>
+              <span id="cartTotal" class="font-display text-2xl font-bold text-coal-900">${total.toFixed(2).replace('.',',')} €</span>
+            </div>`;
+        } else {
+          totalHTML = `
+            <div class="flex justify-between items-center mb-5">
+              <span class="text-gray-500 font-medium">Total</span>
+              <span id="cartTotal" class="font-display text-2xl font-bold text-coal-900">${total.toFixed(2).replace('.',',')} €</span>
+            </div>`;
+        }
+        document.getElementById('cartTotalSection').innerHTML = totalHTML;
+      }
+    }
+
+    // ——— CART PANEL ———
+    function toggleCart() {
+      const panel = document.getElementById('cartPanel');
+      const overlay = document.getElementById('cartOverlay');
+      if(panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        panel.classList.add('flex','animate-slideIn');
+        panel.classList.remove('animate-slideOut');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow='hidden';
+      } else {
+        panel.classList.add('animate-slideOut');
+        panel.classList.remove('animate-slideIn');
+        overlay.classList.add('hidden');
+        document.body.style.overflow='';
+        setTimeout(()=>{ panel.classList.add('hidden'); panel.classList.remove('flex','animate-slideOut'); },300);
+      }
+    }
+
+    // ——— UPSELL ———
+    function showUpsell(item) {
+      document.getElementById('upsellItemName').textContent = `${item.emoji} ${item.name} — ${item.price.toFixed(2).replace('.',',')} €`;
+      const suggestions = boissons.slice(0,3);
+      document.getElementById('upsellSuggestions').innerHTML = suggestions.map(s=>`
+        <button onclick="addToCart('${s.id}','boisson');this.innerHTML='<span class=\\'text-basil-600 font-semibold text-sm flex items-center gap-1\\'><svg class=\\'w-4 h-4\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' d=\\'M5 13l4 4L19 7\\'/></svg> Ajouté !</span>';this.disabled=true;"
+          class="w-full flex items-center gap-3 p-3 rounded-xl bg-white hover:bg-basil-50 border border-gray-100 hover:border-basil-200 transition-all text-left group">
+          <span class="text-2xl">${s.emoji}</span>
+          <div class="flex-1">
+            <p class="text-sm font-semibold text-coal-900 group-hover:text-basil-700">${s.name}</p>
+            <p class="text-xs text-gray-400">${s.desc}</p>
+          </div>
+          <span class="text-sm font-bold text-basil-600">+${s.price.toFixed(2).replace('.',',')}€</span>
+        </button>
+      `).join('');
+      // Fix: all upsell items are boissons now
+
+      document.getElementById('upsellOverlay').classList.remove('hidden');
+      document.getElementById('upsellModal').classList.add('animate-modalIn');
+      document.body.style.overflow='hidden';
+    }
+
+    function closeUpsell() {
+      document.getElementById('upsellOverlay').classList.add('hidden');
+      if(!document.getElementById('cartPanel').classList.contains('flex'))
+        document.body.style.overflow='';
+    }
+
+    function closePayment() {
+      document.getElementById('payOverlay').classList.add('hidden');
+      document.body.style.overflow='';
+    }
+
+    // ——— MOBILE MENU ———
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const open = document.getElementById('menuIcon');
+      const close = document.getElementById('closeIcon');
+      menu.classList.toggle('hidden');
+      open.classList.toggle('hidden');
+      close.classList.toggle('hidden');
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('hidden');
+      document.getElementById('menuIcon').classList.remove('hidden');
+      document.getElementById('closeIcon').classList.add('hidden');
+    }
+
+    // ——— RIPPLE EFFECT ON BUTTONS ———
+    function handleAddClick(e) {
+      const btn = e.currentTarget;
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.left = (e.clientX - rect.left - 10) + 'px';
+      ripple.style.top = (e.clientY - rect.top - 10) + 'px';
+      btn.appendChild(ripple);
+      setTimeout(()=>ripple.remove(), 600);
+    }
+
+    // ——— TOAST NOTIFICATION ———
+    let toastTimeout;
+    function showToast(emoji, text) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastEmoji').textContent = emoji;
+      document.getElementById('toastText').textContent = text;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(()=>toast.classList.remove('show'), 2000);
+    }
+
+    // ——— CARD STAGGER OBSERVER ———
+    function observeCards(container) {
+      const cardObs = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting) { e.target.classList.add('visible'); cardObs.unobserve(e.target); }
+        });
+      }, { threshold:0.05, rootMargin:'0px 0px -50px 0px' });
+      container.querySelectorAll('.card-reveal').forEach(c=>cardObs.observe(c));
+    }
+
+    // ——— SECTION REVEAL ———
+    const sectionObs = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold:0.08 });
+    document.querySelectorAll('.section-reveal').forEach(s=>sectionObs.observe(s));
+
+    // ——— NAVBAR SCROLL EFFECT ———
+    const navbar = document.getElementById('navbar');
+    const sections = document.querySelectorAll('section[id]');
+    let lastScroll = 0;
+    window.addEventListener('scroll',()=>{
+      const y = window.scrollY;
+      // Navbar style
+      if(y > 50) { navbar.classList.add('navbar-scrolled'); }
+      else { navbar.classList.remove('navbar-scrolled'); }
+      // Active nav
+      let current = '';
+      sections.forEach(s=>{
+        if(y >= s.offsetTop - 120) current = s.id;
+      });
+      document.querySelectorAll('.nav-link').forEach(l=>{
+        l.classList.toggle('active', l.getAttribute('href') === '#'+current);
+      });
+      lastScroll = y;
+    }, { passive:true });
+
+    // ——— HERO PARTICLES CANVAS ———
+    (function initParticles(){
+      const canvas = document.getElementById('heroParticles');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize() {
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = canvas.parentElement.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      class Particle {
+        constructor() { this.reset(); }
+        reset() {
+          this.x = Math.random()*canvas.width;
+          this.y = Math.random()*canvas.height;
+          this.size = Math.random()*2+0.5;
+          this.speedX = (Math.random()-0.5)*0.5;
+          this.speedY = (Math.random()-0.5)*0.3;
+          this.opacity = Math.random()*0.4+0.1;
+          this.color = Math.random()>0.5 ? '211,47,47' : '46,125,50';
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height) this.reset();
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(${this.color},${this.opacity})`;
+          ctx.fill();
+        }
+      }
+
+      for(let i=0;i<60;i++) particles.push(new Particle());
+
+      function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p=>{ p.update(); p.draw(); });
+        // Draw connections
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+            const dist=Math.sqrt(dx*dx+dy*dy);
+            if(dist<120){
+              ctx.beginPath();
+              ctx.strokeStyle=`rgba(255,255,255,${0.03*(1-dist/120)})`;
+              ctx.lineWidth=0.5;
+              ctx.moveTo(particles[i].x,particles[i].y);
+              ctx.lineTo(particles[j].x,particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    // ——— PARALLAX ON HERO EMOJIS ———
+    document.addEventListener('mousemove', (e) => {
+      const emojis = document.querySelectorAll('.hero-emoji');
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      emojis.forEach((el, i) => {
+        const speed = (i + 1) * 8;
+        el.style.transform = `translate(${x*speed}px, ${y*speed}px)`;
+      });
+    });
+
+    // ——— SUPPLEMENT MODAL ———
+    let pendingSuppPizzaId = null;
+    let selectedSupps = [];
+
+    function openSuppModal(pizzaId) {
+      pendingSuppPizzaId = pizzaId;
+      selectedSupps = [];
+      const pizza = [...pizzasTomate,...pizzasCreme].find(p=>p.id===pizzaId);
+      if(!pizza) return;
+      const price = sizePrices[currentSize];
+      const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
+      document.getElementById('suppPizzaName').textContent = `${pizza.emoji} ${pizza.name} (${sizeLabel}) — ${price.toFixed(2).replace('.',',')} €`;
+
+      // Build categories
+      const container = document.getElementById('suppCategories');
+      container.innerHTML = Object.entries(supplements).map(([cat, items]) => `
+        <div>
+          <p class="font-display font-semibold text-sm text-coal-800 mb-2">${suppCategoryLabels[cat]}</p>
+          <div class="flex flex-wrap gap-2">
+            ${items.map(item => `
+              <button onclick="toggleSupp(this,'${item.replace(/'/g,"\\'")}')"
+                class="supp-chip px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-gray-200 text-gray-600 hover:border-amber-400 hover:text-amber-700 transition-all"
+                data-supp="${item}">${item}</button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      updateSuppTotal();
+      document.getElementById('suppOverlay').classList.remove('hidden');
+    }
+
+    function toggleSupp(btn, name) {
+      const idx = selectedSupps.indexOf(name);
+      if(idx >= 0) {
+        selectedSupps.splice(idx, 1);
+        btn.classList.remove('bg-amber-100','border-amber-400','text-amber-800');
+        btn.classList.add('border-gray-200','text-gray-600');
+      } else {
+        selectedSupps.push(name);
+        btn.classList.add('bg-amber-100','border-amber-400','text-amber-800');
+        btn.classList.remove('border-gray-200','text-gray-600');
+      }
+      updateSuppTotal();
+    }
+
+    function updateSuppTotal() {
+      const total = selectedSupps.length * SUPPLEMENT_PRICE;
+      document.getElementById('suppTotalPrice').textContent = `+${total.toFixed(2).replace('.',',')} €`;
+    }
+
+    function closeSuppModal() {
+      document.getElementById('suppOverlay').classList.add('hidden');
+      pendingSuppPizzaId = null;
+      selectedSupps = [];
+    }
+
+    function confirmSuppModal(withSupps) {
+      if(!pendingSuppPizzaId) return;
+      const supps = withSupps ? [...selectedSupps] : [];
+      const pizza = [...pizzasTomate,...pizzasCreme].find(p=>p.id===pendingSuppPizzaId);
+      if(!pizza) return;
+
+      const price = sizePrices[currentSize];
+      const suppTotal = supps.length * SUPPLEMENT_PRICE;
+      const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
+      const suppKey = supps.length > 0 ? '_' + supps.sort().join('_').replace(/\s/g,'') : '';
+      const cartId = pendingSuppPizzaId + '_' + currentSize + suppKey;
+
+      const existing = cart.find(c=>c.id===cartId);
+      if(existing) {
+        existing.qty++;
+      } else {
+        cart.push({
+          id: cartId,
+          name: pizza.name + ' (' + sizeLabel + ')' ,
+          desc: pizza.desc,
+          price: price + suppTotal,
+          emoji: pizza.emoji,
+          qty: 1,
+          type: 'pizza',
+          supps: supps
+        });
+      }
+      updateCartUI();
+      showToast(pizza.emoji, pizza.name + ' ajoutée !');
+      showUpsell({ name: pizza.name + ' ' + sizeLabel, price: price + suppTotal, emoji: pizza.emoji });
+      closeSuppModal();
+    }
+
+    // ——— ENHANCE ADD TO CART WITH TOAST ———
+    // (pizza toast is now handled in confirmSuppModal)
+    const _origAddToCart = addToCart;
+    addToCart = function(id, type) {
+      _origAddToCart(id, type);
+      const item = findItem(id);
+      if(item && type !== 'pizza') showToast(item.emoji, item.name + ' ajouté !');
+    };
+
+    // ——— THEME TOGGLE ———
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      localStorage.setItem('pizzayolo-theme', isLight ? 'light' : 'dark');
+      const icon = isLight ? '☀️' : '🌙';
+      const el1 = document.getElementById('themeIcon');
+      const el2 = document.getElementById('themeIconMobile');
+      if(el1) el1.textContent = icon;
+      if(el2) el2.textContent = icon;
+    }
+    // Restore saved theme
+    if(localStorage.getItem('pizzayolo-theme') === 'light') {
+      document.body.classList.add('light');
+      const el1 = document.getElementById('themeIcon');
+      const el2 = document.getElementById('themeIconMobile');
+      if(el1) el1.textContent = '☀️';
+      if(el2) el2.textContent = '☀️';
+    }
+
+    // ——— STRIPE PAYMENT ———
+    // ⚠️ Replace with your real Stripe publishable key
+    const STRIPE_PK = 'pk_test_51TOJ14V05KiIkBIuKH6kQ60LyJRgQqvQvB9LvYGdYliFf0ovSgXRo0P5WvufU3jN6qrGsB7RS1t0JtGbsJgo8ina00ZYwYu6jd';
+    let stripeInstance = null;
+    try { stripeInstance = Stripe(STRIPE_PK); } catch(e) { console.log('Stripe: clé non configurée'); }
+
+    function showPaymentConfirm(method) {
+      const methods = { apple:'Apple Pay', google:'Google Pay', card:'Carte Bancaire' };
+      const promo = getPromoDiscount();
+      const totalNum = getTotal() - promo.discount;
+      const total = totalNum.toFixed(2).replace('.',',');
+      const modeText = orderMode === 'emporter' ? ' (à emporter)' : ' (livraison)';
+
+      // If Stripe is configured, try to use it for card payments
+      if(stripeInstance && STRIPE_PK !== 'pk_test_51TOJ14V05KiIkBIuKH6kQ60LyJRgQqvQvB9LvYGdYliFf0ovSgXRo0P5WvufU3jN6qrGsB7RS1t0JtGbsJgo8ina00ZYwYu6jd') {
+        // Build line items description
+        const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ');
+
+        // Redirect to Stripe Checkout (requires server endpoint)
+        fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: Math.round(totalNum * 100), // in cents
+            description: itemsDesc,
+            mode: orderMode,
+            method: method
+          })
+        })
+        .then(r => r.json())
+        .then(session => {
+          return stripeInstance.redirectToCheckout({ sessionId: session.id });
+        })
+        .catch(err => {
+          // Fallback to simulation if server not running
+          console.log('Stripe redirect failed, simulating:', err);
+          simulatePayment(method, total, modeText);
+        });
+      } else {
+        simulatePayment(method, total, modeText);
+      }
+    }
+
+    function simulatePayment(method, total, modeText) {
+      const methods = { apple:'Apple Pay', google:'Google Pay', card:'Carte Bancaire' };
+      document.getElementById('payMsg').textContent = `Paiement de ${total} € par ${methods[method]} simulé avec succès${modeText}. Votre commande sera prête dans ${orderMode === 'emporter' ? '15' : '30'} minutes !`;
+      document.getElementById('payOverlay').classList.remove('hidden');
+      cart = [];
+      updateCartUI();
+      toggleCart();
+    }
+
+    // ——— INIT ———
+    renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid');
+    renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid');
+    renderMenus();
+    renderSmallGrid(boissons, 'boissonGrid', 'boisson', 'basil');
+    renderAvis();
+  </script>
+</body>
+</html>
