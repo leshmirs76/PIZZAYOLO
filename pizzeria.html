@@ -395,6 +395,11 @@
     body.light .star { color: #D4AF37; }
     body.light .section-title-line { background: linear-gradient(90deg, #D32F2F, #b8860b); }
 
+    body.light .promo-card { border-color: rgba(0,0,0,0.1); }
+    body.light .promo-card:first-child { background: linear-gradient(135deg, #D32F2F, #B71C1C) !important; }
+    body.light .promo-card:last-child { background: linear-gradient(135deg, #2E7D32, #1B5E20) !important; }
+    body.light .promo-card h3, body.light .promo-card p, body.light .promo-card span { color: #fff !important; }
+    body.light .promo-card .gold-shine { -webkit-text-fill-color: #FFD700 !important; background: none !important; }
     body.light footer { background: #1a1a1a !important; }
     body.light .toast .glass-dark { background: rgba(255,255,255,0.95) !important; color: #1a1a1a !important; border-color: rgba(0,0,0,0.08) !important; }
 
@@ -570,7 +575,7 @@
         <p class="text-gray-500 mt-4 max-w-lg mx-auto">Pâte pétrie à la main, ingrédients frais et de qualité.</p>
         <!-- Size selector -->
         <div class="flex items-center justify-center gap-3 mt-6">
-          <button onclick="setSize('senior')" id="btn-senior" class="size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-tomato-500 to-tomato-700 text-white shadow-lg shadow-tomato-500/20">Senior 33cm — 19€</button>
+          <button onclick="setSize('senior')" id="btn-senior" class="size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-basil-500 to-basil-700 text-white shadow-lg shadow-basil-500/20">Senior 33cm — 19€</button>
           <button onclick="setSize('mega')" id="btn-mega" class="size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10">Mega 40cm — 26€</button>
         </div>
         <p class="text-xs text-gold mt-3 font-medium">1 pizza achetée = 1 pizza offerte à emporter !</p>
@@ -1071,15 +1076,16 @@
         b.className = 'size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10';
       });
       const active = document.getElementById('btn-'+size);
-      active.className = 'size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-tomato-500 to-tomato-700 text-white shadow-lg shadow-tomato-500/20 border-0';
-      renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid');
-      renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid');
+      active.className = 'size-btn px-6 py-2.5 rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-basil-500 to-basil-700 text-white shadow-lg shadow-basil-500/20 border-0';
+      renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid', 'red');
+      renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid', 'green');
     }
 
     // ——— RENDER PIZZA GRID ———
-    function renderPizzaGrid(items, gridId) {
+    function renderPizzaGrid(items, gridId, color) {
       const grid = document.getElementById(gridId);
       const price = sizePrices[currentSize];
+      const btnStyle = color === 'green' ? 'background:linear-gradient(135deg,#2E7D32,#1B5E20)' : 'background:linear-gradient(135deg,#D32F2F,#B71C1C)';
       grid.innerHTML = items.map((p,i) => `
         <div class="product-card card-reveal rounded-2xl overflow-hidden group text-center" style="transition-delay:${i*0.06}s">
           <div class="pt-6 pb-3 px-4 relative">
@@ -1096,7 +1102,7 @@
             <h3 class="font-display text-base font-bold text-white mb-0.5">${p.name}</h3>
             <span class="font-bold text-lg price-tag">${price.toFixed(2).replace('.',',')} €</span>
             <p class="text-gray-500 text-xs leading-relaxed mt-2 mb-4 min-h-[2.5rem]">${p.desc}</p>
-            <button onclick="handleAddClick(event);openSuppModal('${p.id}')" class="btn-add w-full py-2.5 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2">
+            <button onclick="handleAddClick(event);openSuppModal('${p.id}')" class="btn-add w-full py-2.5 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2" style="${btnStyle}">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
               Ajouter
             </button>
@@ -1754,8 +1760,8 @@
     }
 
     // ——— INIT ———
-    renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid');
-    renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid');
+    renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid', 'red');
+    renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid', 'green');
     renderMenus();
     renderSmallGrid(boissons, 'boissonGrid', 'boisson', 'basil');
     renderAvis();
