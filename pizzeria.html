@@ -904,7 +904,7 @@
     // ——— DATA : PIZZAS BASE TOMATE ———
     const pizzasTomate = [
       { id:'pt1',  name:'Margherita',      desc:'Tomate, mozzarella, olives', emoji:'🍕', tag:'Classique', img:'base tomate/web/MARGHERITA.webp' },
-      { id:'pt2',  name:'4 Fromages',      desc:'Tomate, mozzarella, emmental, bleu, chèvre', emoji:'🧀', tag:'Gourmand', img:'base tomate/web/4 FROMAGES.webp' },
+      { id:'pt2',  name:'4 Fromages',      desc:'Tomate, mozzarella, emmental, bleu, chèvre', emoji:'🧀', tag:'Gourmand', img:'base tomate/web/4 FROMAGES.webp', fixedPrice:0.01 },
       { id:'pt3',  name:'Bolognaise',      desc:'Tomate, mozzarella, viande hachée, oignons', emoji:'🍝', tag:'', img:'base tomate/web/BOLOGNAISE.webp' },
       { id:'pt4',  name:'Reine',           desc:'Tomate, mozzarella, jambon de dinde, champignons', emoji:'👑', tag:'Populaire', img:'base tomate/web/REINE.webp' },
       { id:'pt5',  name:'Chicken',         desc:'Tomate, mozzarella, poulet, oignons, pomme de terre, olives, champignons', emoji:'🍗', tag:'', img:'base tomate/web/CHICKEN.webp' },
@@ -1100,7 +1100,7 @@
           </div>
           <div class="px-5 pb-5 pt-1 relative z-10">
             <h3 class="font-display text-base font-bold text-white mb-0.5">${p.name}</h3>
-            <span class="font-bold text-lg price-tag">${price.toFixed(2).replace('.',',')} €</span>
+            <span class="font-bold text-lg price-tag">${(p.fixedPrice != null ? p.fixedPrice : price).toFixed(2).replace('.',',')} €</span>
             <p class="text-gray-500 text-xs leading-relaxed mt-2 mb-4 min-h-[2.5rem]">${p.desc}</p>
             <button onclick="handleAddClick(event);openSuppModal('${p.id}')" class="btn-add w-full py-2.5 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2" style="${btnStyle}">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
@@ -1547,7 +1547,7 @@
       selectedSupps = [];
       const pizza = [...pizzasTomate,...pizzasCreme].find(p=>p.id===pizzaId);
       if(!pizza) return;
-      const price = sizePrices[currentSize];
+      const price = pizza.fixedPrice != null ? pizza.fixedPrice : sizePrices[currentSize];
       const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
       document.getElementById('suppPizzaName').textContent = `${pizza.emoji} ${pizza.name} (${sizeLabel}) — ${price.toFixed(2).replace('.',',')} €`;
 
