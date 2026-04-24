@@ -374,13 +374,14 @@
       border-color: rgba(211,47,47,0.15);
     }
     body.light .product-card h3, body.light h2, body.light h3 { color: #1a1a1a !important; }
-    body.light .product-card p, body.light .text-gray-500 { color: #777 !important; }
+    body.light .product-card p, body.light .text-gray-500 { color: #444 !important; }
+    body.light .text-gray-400 { color: #555 !important; }
     body.light .price-tag { color: #D32F2F !important; }
-    body.light .text-gold { color: #b8860b !important; }
-    body.light .gold-shine { background: linear-gradient(90deg, #D32F2F, #b8860b, #D32F2F); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% auto; animation: shimmer 3s linear infinite; }
+    body.light .text-gold { color: #996515 !important; }
+    body.light .gold-shine { background: linear-gradient(90deg, #D32F2F, #996515, #D32F2F); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% auto; animation: shimmer 3s linear infinite; }
 
-    body.light .glass { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.08); }
-    body.light .glass span { color: #666 !important; }
+    body.light .glass { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+    body.light .glass span { color: #444 !important; }
 
     body.light .pizza-img-wrap { box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06); }
     body.light .product-card:hover .pizza-img-wrap { box-shadow: 0 12px 40px rgba(211,47,47,0.15), 0 0 0 2px rgba(211,47,47,0.2); }
@@ -388,7 +389,8 @@
 
     body.light .avis-card { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.06); }
     body.light .avis-card:hover { box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: rgba(211,47,47,0.12); }
-    body.light .avis-card p { color: #555 !important; }
+    body.light .avis-card p { color: #333 !important; }
+    body.light .avis-card .text-gray-400 { color: #666 !important; }
 
     body.light .star { color: #D4AF37; }
     body.light .section-title-line { background: linear-gradient(90deg, #D32F2F, #b8860b); }
@@ -396,9 +398,14 @@
     body.light footer { background: #1a1a1a !important; }
     body.light .toast .glass-dark { background: rgba(255,255,255,0.95) !important; color: #1a1a1a !important; border-color: rgba(0,0,0,0.08) !important; }
 
-    body.light .size-btn { color: #555 !important; }
+    body.light .size-btn { color: #333 !important; }
+    body.light .size-btn.active { color: #D32F2F !important; }
     body.light .cart-btn-area button { color: #333; }
     body.light .cart-btn-area button svg { color: #333; }
+    body.light .tag-badge { background: #D32F2F; }
+    body.light .btn-add { background: linear-gradient(135deg, #D32F2F, #B71C1C) !important; }
+    body.light .order-mode-btn { color: #333 !important; }
+    body.light .text-xs.text-gray-400 { color: #555 !important; }
   </style>
 </head>
 <body class="bg-[#0a0a0a] text-white font-body">
@@ -1635,8 +1642,8 @@
       if(el1) el1.textContent = icon;
       if(el2) el2.textContent = icon;
     }
-    // Restore saved theme
-    if(localStorage.getItem('pizzayolo-theme') === 'light') {
+    // Default = light mode. Only switch to dark if user previously chose dark
+    if(localStorage.getItem('pizzayolo-theme') !== 'dark') {
       document.body.classList.add('light');
       const el1 = document.getElementById('themeIcon');
       const el2 = document.getElementById('themeIconMobile');
