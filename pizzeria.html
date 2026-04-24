@@ -1601,7 +1601,7 @@
       const pizza = [...pizzasTomate,...pizzasCreme].find(p=>p.id===pendingSuppPizzaId);
       if(!pizza) return;
 
-      const price = sizePrices[currentSize];
+      const price = pizza.fixedPrice != null ? pizza.fixedPrice : sizePrices[currentSize];
       const suppTotal = supps.length * SUPPLEMENT_PRICE;
       const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
       const suppKey = supps.length > 0 ? '_' + supps.sort().join('_').replace(/\s/g,'') : '';
@@ -1718,45 +1718,33 @@
       const modeText = orderMode === 'emporter' ? ' (à emporter)' : ' (livraison)';
       const delivInfo = orderMode === 'livraison' ? getDeliveryInfo() : null;
 
-      // If Stripe is configured, try to use it for card payments
-      if(stripeInstance) {
-        // Build line items description
-        const delivDesc = delivInfo ? ` | Livraison: ${delivInfo.nom}, ${delivInfo.tel}, ${delivInfo.adresse}, ${delivInfo.cp} ${delivInfo.ville}` : '';
-        const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ') + delivDesc;
+      // Build line items description
+      const delivDesc = delivInfo ? ` | Livraison: ${delivInfo.nom}, ${delivInfo.tel}, ${delivInfo.adresse}, ${delivInfo.cp} ${delivInfo.ville}` : '';
+      const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ') + delivDesc;
 
-        // Redirect to Stripe Checkout (requires server endpoint)
-        fetch('/api/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: Math.round(totalNum * 100), // in cents
-            description: itemsDesc,
-            mode: orderMode,
-            method: method
-          })
+      // Redirect to Stripe Checkout
+      fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: Math.round(totalNum * 100),
+          description: itemsDesc,
+          mode: orderMode,
+          method: method
         })
-        .then(r => r.json())
-        .then(session => {
-          return stripeInstance.redirectToCheckout({ sessionId: session.id });
-        })
-        .catch(err => {
-          // Fallback to simulation if server not running
-          console.log('Stripe redirect failed, simulating:', err);
-          simulatePayment(method, total, modeText);
-        });
-      } else {
-        simulatePayment(method, total, modeText);
-      }
-    }
-
-    function simulatePayment(method, total, modeText) {
-      const methods = { apple:'Apple Pay', google:'Google Pay', card:'Carte Bancaire' };
-      const delivMsg = orderMode === 'livraison' ? ` Livraison à : ${getDeliveryInfo().adresse}` : '';
-      document.getElementById('payMsg').textContent = `Paiement de ${total} € par ${methods[method]} confirmé${modeText}.${delivMsg} Votre commande sera prête dans ${orderMode === 'emporter' ? '15' : '30'} minutes !`;
-      document.getElementById('payOverlay').classList.remove('hidden');
-      cart = [];
-      updateCartUI();
-      toggleCart();
+      })
+      .then(r => r.json())
+      .then(session => {
+        if(session.error) {
+          alert('Erreur paiement : ' + session.error);
+          return;
+        }
+        return stripeInstance.redirectToCheckout({ sessionId: session.id });
+      })
+      .catch(err => {
+        alert('Erreur de connexion au serveur de paiement. Réessayez.');
+        console.error('Stripe error:', err);
+      });
     }
 
     // ——— INIT ———
