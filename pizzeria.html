@@ -1658,7 +1658,6 @@
     }
 
     // ——— STRIPE PAYMENT ———
-    // ⚠️ Replace with your real Stripe publishable key
     const STRIPE_PK = 'pk_live_51TOJ0sV05JaAbZvTmb4ax8whqCmPeqZzQvHLMlyhaZPnoi982PLl64uBVVGaS82EnczHxbVKaZxefuOcdKgkBGFk00RGE2XavC';
     let stripeInstance = null;
     try { stripeInstance = Stripe(STRIPE_PK); } catch(e) { console.log('Stripe: clé non configurée'); }
