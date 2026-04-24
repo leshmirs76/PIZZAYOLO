@@ -1751,23 +1751,6 @@
       });
     }
 
-    // ——— LEGAL MODALS ———
-    function openLegal(type) {
-      const map = { cgv:'legalCGV', remboursement:'legalRemboursement', mentions:'legalMentions' };
-      const tpl = document.getElementById(map[type]);
-      if(!tpl) return;
-      document.getElementById('legalContent').innerHTML = tpl.innerHTML;
-      document.getElementById('legalOverlay').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeLegal() {
-      document.getElementById('legalOverlay').classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-    document.getElementById('legalOverlay').addEventListener('click', function(e) {
-      if(e.target === this) closeLegal();
-    });
-
     // ——— INIT ———
     renderPizzaGrid(pizzasTomate, 'pizzaTomateGrid', 'red');
     renderPizzaGrid(pizzasCreme, 'pizzaCremeGrid', 'green');
@@ -1905,6 +1888,23 @@
 </template>
 
 <script>
+// ——— LEGAL MODALS ———
+function openLegal(type) {
+  const map = { cgv:'legalCGV', remboursement:'legalRemboursement', mentions:'legalMentions' };
+  const tpl = document.getElementById(map[type]);
+  if(!tpl) return;
+  document.getElementById('legalContent').innerHTML = tpl.innerHTML;
+  document.getElementById('legalOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeLegal() {
+  document.getElementById('legalOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.getElementById('legalOverlay').addEventListener('click', function(e) {
+  if(e.target === this) closeLegal();
+});
+
 // Fallback: si après 2s les sections sont toujours invisibles, on force l'affichage
 setTimeout(function(){
   document.body.classList.add('force-visible');
