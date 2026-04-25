@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -178,12 +178,14 @@
     }
     .pizza-img-wrap img {
       width: 100%; height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      object-position: center;
+      transform: scale(1.18);
       transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.5s ease;
       filter: brightness(0.95) contrast(1.05);
     }
     .product-card:hover .pizza-img-wrap img {
-      transform: scale(1.15);
+      transform: scale(1.25);
       filter: brightness(1.1) contrast(1.08);
     }
     /* Glow ring behind the pizza */
@@ -409,6 +411,7 @@
     body.light .cart-btn-area button svg { color: #333; }
     body.light .tag-badge { background: #D32F2F; }
     body.light .btn-add { background: linear-gradient(135deg, #D32F2F, #B71C1C) !important; }
+    body.light #pizzaCremeGrid .btn-add { background: linear-gradient(135deg, #2E7D32, #1B5E20) !important; }
     body.light .order-mode-btn { color: #333 !important; }
     body.light .text-xs.text-gray-400 { color: #555 !important; }
   </style>
@@ -500,7 +503,7 @@
 
       <!-- Promo Cards -->
       <div class="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-        <!-- A emporter -->
+        <!-- À emporter -->
         <div class="promo-card animate-fadeInLeft stagger-3 animate-glow rounded-2xl p-6 md:p-8 bg-gradient-to-br from-tomato-600/20 to-tomato-800/30 text-white cursor-pointer" onclick="setOrderMode('emporter');document.getElementById('pizzas').scrollIntoView({behavior:'smooth'})">
           <div class="flex items-start justify-between mb-4">
             <span class="bg-tomato-500/20 border border-tomato-500/30 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider text-tomato-200">À emporter</span>
@@ -917,21 +920,21 @@
       { id:'pt7',  name:'Kebab',           desc:'Tomate, mozzarella, viande kebab, poivrons, oignons', emoji:'🥙', tag:'', img:'base tomate/web/KEBAB.webp' },
       { id:'pt8',  name:'Tonnarella',      desc:'Tomate, mozzarella, poivrons, tomate fraîche, thon', emoji:'🐟', tag:'', img:'base tomate/web/TONNARELLA.webp' },
       { id:'pt9',  name:'Calzone',         desc:'Tomate, mozzarella, viande hachée, lardons, pomme de terre, oeuf', emoji:'🥟', tag:'' },
-      { id:'pt10', name:'Campagnarde',     desc:'Tomate, mozzarella, lardons, olives, oignons, oeuf', emoji:'🌾', tag:'', img:'base creme/web/CAMPAGNARDE.webp' },
-      { id:'pt11', name:'Norvégienne',     desc:'Tomate, mozzarella, saumon fumé, olives', emoji:'🐠', tag:'', img:'base creme/web/NORVEGIENNE.webp' },
-      { id:'pt12', name:'Méditerranéenne', desc:'Tomate, mozzarella, thon, poivrons, oignons', emoji:'🌊', tag:'', img:'base creme/web/MEDITERRANEENNE.webp' },
-      { id:'pt13', name:'Spéciale VH',    desc:'Tomate, mozzarella, pomme de terre, oignons, poivrons', emoji:'🎯', tag:'', img:'base tomate/web/SPECIALE VH.webp' },
+      { id:'pt13', name:'Spéciale VH',     desc:'Tomate, mozzarella, pomme de terre, oignons, poivrons', emoji:'🎯', tag:'', img:'base tomate/web/SPECIALE VH.webp' },
+      { id:'pc1',  name:'Orientale',       desc:'Tomate, mozzarella, merguez, poivrons', emoji:'🌙', tag:'', img:'base tomate/web/ORIENTAL.webp' },
+      { id:'pc2',  name:'Cantilienne',     desc:'Tomate, mozzarella, viande hachée, dinde, oeuf', emoji:'🏰', tag:'', img:'base tomate/web/CANTILIENNE.webp' },
+      { id:'pc3',  name:'Buffalo',         desc:'Tomate, mozzarella, viande hachée, poivrons', emoji:'🦬', tag:'', img:'base tomate/web/BUFFALO.webp' },
+      { id:'pc4',  name:'Mexicaine',       desc:'Tomate, mozzarella, viande hachée, chorizo, sauce barbecue, poivrons', emoji:'🌮', tag:'Épicé', img:'base tomate/web/MEXICAINE.webp' },
+      { id:'pc5',  name:'4 Saisons',       desc:'Tomate, mozzarella, olives, champignons, poivrons, artichauts', emoji:'🍂', tag:'', img:'base tomate/web/4 SAISONS.webp' },
+      { id:'pc6',  name:'Trabzon',         desc:'Tomate, mozzarella, emmental, sucuk, cheddar, pomme de terre', emoji:'🇹🇷', tag:'', img:'base tomate/web/TRABZON.webp' },
+      { id:'pc7',  name:'Ankara',          desc:'Tomate, mozzarella, sucuk, cheddar', emoji:'🇹🇷', tag:'', img:'base tomate/web/ANKARA.webp' },
     ];
 
     // ——— DATA : PIZZAS BASE CRÈME ———
     const pizzasCreme = [
-      { id:'pc1',  name:'Orientale',        desc:'Crème fraîche, mozzarella, merguez, poivrons', emoji:'🌙', tag:'', img:'base tomate/web/ORIENTAL.webp' },
-      { id:'pc2',  name:'Cantilienne',      desc:'Crème fraîche, mozzarella, viande hachée, dinde, oeuf', emoji:'🏰', tag:'', img:'base tomate/web/CANTILIENNE.webp' },
-      { id:'pc3',  name:'Buffalo',          desc:'Crème fraîche, mozzarella, viande hachée, poivrons', emoji:'🦬', tag:'', img:'base tomate/web/BUFFALO.webp' },
-      { id:'pc4',  name:'Mexicaine',        desc:'Crème fraîche, mozzarella, viande hachée, chorizo, sauce barbecue, poivrons', emoji:'🌮', tag:'Épicé', img:'base tomate/web/MEXICAINE.webp' },
-      { id:'pc5',  name:'4 Saisons',        desc:'Crème fraîche, mozzarella, olives, champignons, poivrons, artichauts', emoji:'🍂', tag:'', img:'base tomate/web/4 SAISONS.webp' },
-      { id:'pc6',  name:'Trabzon',          desc:'Crème fraîche, mozzarella, emmental, sucuk, cheddar, pomme de terre', emoji:'🇹🇷', tag:'', img:'base tomate/web/TRABZON.webp' },
-      { id:'pc7',  name:'Ankara',           desc:'Crème fraîche, mozzarella, sucuk, cheddar', emoji:'🇹🇷', tag:'', img:'base tomate/web/ANKARA.webp' },
+      { id:'pt10', name:'Campagnarde',      desc:'Crème fraîche, mozzarella, lardons, olives, oignons, oeuf', emoji:'🌾', tag:'', img:'base creme/web/CAMPAGNARDE.webp' },
+      { id:'pt11', name:'Norvégienne',      desc:'Crème fraîche, mozzarella, saumon fumé, olives', emoji:'🐠', tag:'', img:'base creme/web/NORVEGIENNE.webp' },
+      { id:'pt12', name:'Méditerranéenne',  desc:'Crème fraîche, mozzarella, thon, poivrons, oignons', emoji:'🌊', tag:'', img:'base creme/web/MEDITERRANEENNE.webp' },
       { id:'pc9',  name:'Fermière',         desc:'Crème fraîche, mozzarella, jambon, champignons', emoji:'🏡', tag:'', img:'base creme/web/FERMIERE.webp' },
       { id:'pc10', name:'Western',          desc:'Crème fraîche, mozzarella, poulet, oignons, grains, oeuf', emoji:'🤠', tag:'', img:'base creme/web/WESTERN.webp' },
       { id:'pc11', name:'Suprême Chicken',  desc:'Crème fraîche, mozzarella, poulet, miel, curry', emoji:'⭐', tag:'Populaire', img:'base creme/web/SUPREME CHICKEN.webp' },
@@ -1098,7 +1101,7 @@
             <div class="relative inline-block">
               <div class="pizza-glow"></div>
               ${p.img
-                ? `<div class="pizza-img-wrap"><div class="pizza-ring"></div><img src="${p.img}" alt="${p.name}" loading="lazy"></div>`
+                ? `<div class="pizza-img-wrap"><div class="pizza-ring"></div><img src="${p.img}" alt="${p.name}" loading="lazy" style="${p.imgStyle||''}"></div>`
                 : `<div class="pizza-img-wrap flex items-center justify-center bg-gradient-to-br from-white/10 to-white/5"><span class="text-6xl card-emoji drop-shadow-lg">${p.emoji}</span></div>`
               }
             </div>
@@ -1148,7 +1151,7 @@
         <div class="product-card card-reveal rounded-2xl flex flex-col overflow-hidden group text-center" style="transition-delay:${idx*0.05}s">
           <div class="pt-4 pb-2 px-4">
             ${i.img
-              ? `<div class="w-24 h-24 mx-auto rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/5 transition-transform duration-500 group-hover:scale-105"><img src="${i.img}" alt="${i.name}" class="w-full h-full object-contain" loading="lazy"></div>`
+              ? `<div class="w-24 h-24 mx-auto rounded-2xl overflow-hidden ${gridId === 'boissonGrid' ? 'bg-transparent border border-white/10' : 'bg-[#0a0a0a] border border-white/5'} transition-transform duration-500 group-hover:scale-105"><img src="${i.img}" alt="${i.name}" class="w-full h-full object-contain" loading="lazy" style="transform:scale(${gridId === 'boissonGrid' ? '1.4' : '1'})"></div>`
               : `<div class="text-4xl mb-1 card-emoji inline-block drop-shadow-lg">${i.emoji}</div>`
             }
           </div>
@@ -1912,3 +1915,6 @@ setTimeout(function(){
 </script>
 </body>
 </html>
+
+
+
