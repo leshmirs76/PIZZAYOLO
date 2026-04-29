@@ -7,3 +7,5 @@ BOISSON/*.png
 Pizza-yolo-menu-17v.jpg
 menu.pdf
 STRIPE-SETUP.md
+# Serveur impression local (contient pas de secrets mais pas utile sur Vercel)
+print-server/

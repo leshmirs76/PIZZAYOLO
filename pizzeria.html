@@ -762,15 +762,25 @@
           <span id="cartTotal" class="font-display text-2xl font-bold text-coal-900">0,00 €</span>
         </div>
       </div>
-      <!-- Delivery info form (shown only in livraison mode) -->
-      <div id="deliveryForm" class="hidden mb-4">
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3">
-          <p class="text-xs font-bold text-amber-700 uppercase tracking-wide flex items-center gap-2 mb-3">
-            <span>🚛</span> Informations de livraison
+      <!-- Client info (toujours visible) -->
+      <div class="mb-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-3">
+          <p class="text-xs font-bold text-blue-700 uppercase tracking-wide flex items-center gap-2 mb-3">
+            <span>👤</span> Vos informations
           </p>
           <div class="space-y-2.5">
             <input type="text" id="delivNom" placeholder="Nom & Prénom *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
             <input type="tel" id="delivTel" placeholder="Téléphone *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
+          </div>
+        </div>
+      </div>
+      <!-- Delivery address (shown only in livraison mode) -->
+      <div id="deliveryForm" class="hidden mb-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-3">
+          <p class="text-xs font-bold text-amber-700 uppercase tracking-wide flex items-center gap-2 mb-3">
+            <span>🚛</span> Adresse de livraison
+          </p>
+          <div class="space-y-2.5">
             <input type="text" id="delivAdresse" placeholder="Adresse complète *" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required>
             <div class="flex gap-2">
               <input type="text" id="delivCP" placeholder="Code postal *" maxlength="5" class="w-[120px] px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900" required oninput="lookupCity(this.value)">
@@ -781,8 +791,8 @@
             <textarea id="delivNote" placeholder="Note pour le livreur (optionnel)" rows="2" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900 resize-none"></textarea>
           </div>
         </div>
-        <p id="delivError" class="text-xs text-red-500 font-semibold hidden mb-2"></p>
       </div>
+      <p id="delivError" class="text-xs text-red-500 font-semibold hidden mb-2"></p>
 
       <!-- Payment button -->
       <div class="space-y-3">
@@ -1689,14 +1699,19 @@
     }
 
     function validateDelivery() {
-      if(orderMode !== 'livraison') return true;
-      const info = getDeliveryInfo();
+      const nom = document.getElementById('delivNom').value.trim();
+      const tel = document.getElementById('delivTel').value.trim();
       const errEl = document.getElementById('delivError');
-      if(!info.nom) { errEl.textContent = 'Merci de renseigner votre nom.'; errEl.classList.remove('hidden'); return false; }
-      if(!info.tel) { errEl.textContent = 'Merci de renseigner votre téléphone.'; errEl.classList.remove('hidden'); return false; }
-      if(!info.adresse) { errEl.textContent = 'Merci de renseigner votre adresse.'; errEl.classList.remove('hidden'); return false; }
-      if(!info.cp || info.cp.length !== 5) { errEl.textContent = 'Merci de renseigner un code postal valide.'; errEl.classList.remove('hidden'); return false; }
-      if(!info.ville) { errEl.textContent = 'Merci de sélectionner votre ville.'; errEl.classList.remove('hidden'); return false; }
+      // Nom et téléphone obligatoires pour tous les modes
+      if(!nom) { errEl.textContent = 'Merci de renseigner votre nom.'; errEl.classList.remove('hidden'); return false; }
+      if(!tel) { errEl.textContent = 'Merci de renseigner votre téléphone.'; errEl.classList.remove('hidden'); return false; }
+      // Adresse obligatoire uniquement pour livraison
+      if(orderMode === 'livraison') {
+        const info = getDeliveryInfo();
+        if(!info.adresse) { errEl.textContent = 'Merci de renseigner votre adresse.'; errEl.classList.remove('hidden'); return false; }
+        if(!info.cp || info.cp.length !== 5) { errEl.textContent = 'Merci de renseigner un code postal valide.'; errEl.classList.remove('hidden'); return false; }
+        if(!info.ville) { errEl.textContent = 'Merci de sélectionner votre ville.'; errEl.classList.remove('hidden'); return false; }
+      }
       errEl.classList.add('hidden');
       return true;
     }
@@ -1712,9 +1727,18 @@
       const modeText = orderMode === 'emporter' ? ' (à emporter)' : ' (livraison)';
       const delivInfo = orderMode === 'livraison' ? getDeliveryInfo() : null;
 
-      // Build line items description
-      const delivDesc = delivInfo ? ` | Livraison: ${delivInfo.nom}, ${delivInfo.tel}, ${delivInfo.adresse}, ${delivInfo.cp} ${delivInfo.ville}` : '';
-      const itemsDesc = cart.map(c => `${c.qty}x ${c.name}`).join(', ') + delivDesc;
+      // Build line items description (format: qty;nom;prix;supps)
+      const clientNom = document.getElementById('delivNom').value.trim();
+      const clientTel = document.getElementById('delivTel').value.trim();
+      let clientDesc = ` | Client: ${clientNom};;${clientTel}`;
+      if(delivInfo) {
+        clientDesc += ` | Livraison: ${delivInfo.adresse};;${delivInfo.cp} ${delivInfo.ville}${delivInfo.note ? ';;Note: '+delivInfo.note : ''}`;
+      }
+      const itemsDesc = cart.map(c => {
+        let line = `${c.qty};${c.name};${c.price.toFixed(2)}`;
+        if(c.supps && c.supps.length > 0) line += ';+' + c.supps.join('+');
+        return line;
+      }).join('||') + clientDesc;
 
       // Redirect to Stripe Checkout
       fetch('/api/create-checkout-session', {
