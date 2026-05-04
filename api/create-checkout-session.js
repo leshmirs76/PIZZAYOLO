@@ -21,6 +21,10 @@ module.exports = async (req, res) => {
         },
         quantity: 1,
       }],
+      metadata: {
+        order_details: description,
+        order_mode: mode,
+      },
       mode: 'payment',
       success_url: `${baseUrl}/remerciement.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/pizzeria.html?payment=cancel`,

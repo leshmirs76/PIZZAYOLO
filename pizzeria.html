@@ -1346,6 +1346,14 @@
               <span id="cartTotal" class="font-display text-2xl font-bold text-coal-900">${total.toFixed(2).replace('.',',')} €</span>
             </div>`;
         }
+        // Message minimum livraison
+        if(orderMode === 'livraison') {
+          const promoD = getPromoDiscount();
+          const finalTotal = total - promoD.discount;
+          if(finalTotal < 20) {
+            totalHTML += `<div class="mt-2 text-center text-sm text-red-500 font-semibold">Minimum 20,00 € pour la livraison (encore ${(20 - finalTotal).toFixed(2).replace('.',',')} €)</div>`;
+          }
+        }
         document.getElementById('cartTotalSection').innerHTML = totalHTML;
       }
     }
@@ -1727,6 +1735,19 @@
     function showPaymentConfirm(method) {
       // Validate delivery info if livraison
       if(!validateDelivery()) return;
+
+      // Minimum 20€ pour livraison
+      if(orderMode === 'livraison') {
+        const minLivraison = 20;
+        const promo0 = getPromoDiscount();
+        const currentTotal = getTotal() - promo0.discount;
+        if(currentTotal < minLivraison) {
+          const errEl = document.getElementById('delivError');
+          errEl.textContent = 'Minimum de commande : 20,00 € pour la livraison (actuel : ' + currentTotal.toFixed(2).replace('.',',') + ' €)';
+          errEl.classList.remove('hidden');
+          return;
+        }
+      }
 
       const methods = { apple:'Apple Pay', google:'Google Pay', card:'Carte Bancaire' };
       const promo = getPromoDiscount();
