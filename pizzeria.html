@@ -819,6 +819,27 @@
     </div>
   </aside>
 
+  <!-- ===================== MENU SELECTION MODAL ===================== -->
+  <div id="menuOverlay" class="fixed inset-0 z-[75] overlay-bg hidden flex items-end sm:items-center justify-center p-4" onclick="if(event.target===this)closeMenuModal()">
+    <div class="bg-white rounded-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-modalIn">
+      <div class="p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-display text-lg font-bold text-coal-900">Compose ton menu</h3>
+            <p id="menuModalName" class="text-sm text-gray-500"></p>
+          </div>
+          <button onclick="closeMenuModal()" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="menuSelections" class="space-y-4"></div>
+        <button onclick="confirmMenuModal()" class="w-full mt-5 py-3 rounded-xl text-white font-bold text-sm" style="background:linear-gradient(135deg,#2E7D32,#1B5E20)">
+          Ajouter au panier
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== UPSELL MODAL ===================== -->
   <!-- ===================== SUPPLEMENT MODAL ===================== -->
   <div id="suppOverlay" class="fixed inset-0 z-[75] overlay-bg hidden flex items-end sm:items-center justify-center p-4" onclick="if(event.target===this)closeSuppModal()">
@@ -1649,10 +1670,102 @@
       closeSuppModal();
     }
 
+    // ——— MENU MODAL ———
+    let pendingMenu = null;
+
+    function openMenuModal(menuId) {
+      const menu = menus.find(m => m.id === menuId);
+      if (!menu) return;
+      pendingMenu = { ...menu, choices: [] };
+      document.getElementById('menuModalName').textContent = menu.emoji + ' ' + menu.name + ' — ' + menu.price.toFixed(2).replace('.',',') + ' €';
+
+      const allPizzas = [...pizzasTomate, ...pizzasCreme];
+      const container = document.getElementById('menuSelections');
+      let html = '';
+
+      // Config par menu
+      let slots = [];
+      if (menuId === 'm1') {
+        slots = [
+          { label: 'Pizza Senior', size: 'Senior', pizzas: allPizzas },
+          { label: 'Boisson 33cl', type: 'boisson', items: boissons.filter(b => b.name.includes('Canette') || b.name.includes('Eau 50cl')) }
+        ];
+      } else if (menuId === 'm2') {
+        slots = [
+          { label: 'Pizza 1 (Senior)', size: 'Senior', pizzas: allPizzas },
+          { label: 'Pizza 2 (Senior)', size: 'Senior', pizzas: allPizzas },
+          { label: 'Boisson 1 (33cl)', type: 'boisson', items: boissons.filter(b => b.name.includes('Canette') || b.name.includes('Eau 50cl')) },
+          { label: 'Boisson 2 (33cl)', type: 'boisson', items: boissons.filter(b => b.name.includes('Canette') || b.name.includes('Eau 50cl')) }
+        ];
+      } else if (menuId === 'm3') {
+        slots = [
+          { label: 'Pizza Mega', size: 'Mega', pizzas: allPizzas },
+          { label: 'Pizza Senior', size: 'Senior', pizzas: allPizzas },
+          { label: 'Boisson 1,5L', type: 'boisson', items: boissons.filter(b => b.name.includes('1.5L') || b.name.includes('1,5L') || b.name.includes('2L') || b.name.includes('Coca')) }
+        ];
+      }
+
+      slots.forEach((slot, idx) => {
+        html += '<div class="bg-gray-50 rounded-xl p-3">';
+        html += '<label class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 block">' + slot.label + '</label>';
+        html += '<select id="menuSlot' + idx + '" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white text-coal-900 focus:outline-none focus:border-basil-500">';
+        html += '<option value="">-- Choisir --</option>';
+        if (slot.pizzas) {
+          slot.pizzas.forEach(p => {
+            html += '<option value="' + p.name + ' (' + slot.size + ')">' + p.emoji + ' ' + p.name + '</option>';
+          });
+        } else if (slot.items) {
+          slot.items.forEach(b => {
+            html += '<option value="' + b.name + '">' + b.emoji + ' ' + b.name + '</option>';
+          });
+        }
+        html += '</select></div>';
+      });
+
+      pendingMenu.slotCount = slots.length;
+      container.innerHTML = html;
+      document.getElementById('menuOverlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenuModal() {
+      document.getElementById('menuOverlay').classList.add('hidden');
+      document.body.style.overflow = '';
+      pendingMenu = null;
+    }
+
+    function confirmMenuModal() {
+      if (!pendingMenu) return;
+      const choices = [];
+      for (let i = 0; i < pendingMenu.slotCount; i++) {
+        const sel = document.getElementById('menuSlot' + i);
+        if (!sel.value) {
+          sel.style.borderColor = '#EF4444';
+          return;
+        }
+        choices.push(sel.value);
+      }
+      const choiceStr = choices.join(' + ');
+      const menuName = pendingMenu.name + ' (' + choiceStr + ')';
+      const existing = cart.find(c => c.id === pendingMenu.id && c.menuDetail === choiceStr);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ id: pendingMenu.id + '_' + Date.now(), name: menuName, price: pendingMenu.price, qty: 1, type: 'menu', emoji: pendingMenu.emoji, menuDetail: choiceStr });
+      }
+      updateCartUI();
+      showToast(pendingMenu.emoji, pendingMenu.name + ' ajouté !');
+      closeMenuModal();
+    }
+
     // ——— ENHANCE ADD TO CART WITH TOAST ———
     // (pizza toast is now handled in confirmSuppModal)
     const _origAddToCart = addToCart;
     addToCart = function(id, type) {
+      if (type === 'menu') {
+        openMenuModal(id);
+        return;
+      }
       _origAddToCart(id, type);
       const item = findItem(id);
       if(item && type !== 'pizza') showToast(item.emoji, item.name + ' ajouté !');
