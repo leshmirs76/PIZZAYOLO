@@ -728,7 +728,7 @@
 
   <!-- ===================== CART SLIDE-IN ===================== -->
   <div id="cartOverlay" class="fixed inset-0 z-[60] overlay-bg hidden" onclick="toggleCart()"></div>
-  <aside id="cartPanel" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white z-[70] shadow-2xl hidden" style="display:none;flex-direction:column;">
+  <aside id="cartPanel" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white z-[70] shadow-2xl hidden">
     <!-- Cart header (fixed top) -->
     <div class="flex-shrink-0 p-5 border-b border-gray-100">
       <div class="flex items-center justify-between mb-4">
@@ -1394,7 +1394,7 @@
       const overlay = document.getElementById('cartOverlay');
       if(panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
-        panel.classList.add('flex','animate-slideIn');
+        panel.classList.add('flex','flex-col','animate-slideIn');
         panel.classList.remove('animate-slideOut');
         overlay.classList.remove('hidden');
         document.body.style.overflow='hidden';
@@ -1403,7 +1403,7 @@
         panel.classList.remove('animate-slideIn');
         overlay.classList.add('hidden');
         document.body.style.overflow='';
-        setTimeout(()=>{ panel.classList.add('hidden'); panel.classList.remove('flex','animate-slideOut'); },300);
+        setTimeout(()=>{ panel.classList.add('hidden'); panel.classList.remove('flex','flex-col','animate-slideOut'); },300);
       }
     }
 
