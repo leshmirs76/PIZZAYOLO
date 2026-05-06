@@ -847,41 +847,23 @@
   </div>
 
   <!-- ===================== UPSELL MODAL ===================== -->
-  <!-- ===================== SUPPLEMENT MODAL ===================== -->
+  <!-- ===================== NOTE PIZZA MODAL ===================== -->
   <div id="suppOverlay" class="fixed inset-0 z-[75] overlay-bg hidden flex items-end sm:items-center justify-center p-4" onclick="if(event.target===this)closeSuppModal()">
     <div class="bg-white rounded-2xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-modalIn">
       <div class="p-5">
-        <!-- Header -->
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-display text-lg font-bold text-coal-900">Personnalise ta pizza</h3>
+            <h3 class="font-display text-lg font-bold text-coal-900">Une remarque ?</h3>
             <p id="suppPizzaName" class="text-sm text-gray-500"></p>
           </div>
           <button onclick="closeSuppModal()" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-
-        <p class="text-xs text-gray-400 mb-4">Chaque supplément : <span class="font-bold text-gold">1,50 €</span></p>
-
-        <!-- Supplement categories -->
-        <div id="suppCategories" class="space-y-4 mb-5"></div>
-
-        <!-- Total supplements -->
-        <div id="suppTotalBar" class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 mb-4 flex items-center justify-between">
-          <span class="text-sm font-semibold text-coal-800">Suppléments :</span>
-          <span id="suppTotalPrice" class="font-bold text-gold">+0,00 €</span>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="flex gap-3">
-          <button onclick="confirmSuppModal(false)" class="flex-1 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold text-coal-800 hover:bg-gray-50 transition-colors">
-            Sans supplément
-          </button>
-          <button onclick="confirmSuppModal(true)" class="flex-1 py-3 rounded-xl bg-tomato-500 text-white text-sm font-semibold hover:bg-tomato-600 transition-colors">
-            Ajouter au panier
-          </button>
-        </div>
+        <textarea id="pizzaNoteInput" placeholder="Ex: Sans oignons, bien cuite, supplément fromage..." rows="3" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm focus:outline-none focus:border-tomato-500 focus:ring-1 focus:ring-tomato-500 bg-white text-coal-900 resize-none mb-4"></textarea>
+        <button onclick="confirmSuppModal()" class="w-full py-3 rounded-xl bg-tomato-500 text-white text-sm font-semibold hover:bg-tomato-600 transition-colors">
+          Ajouter au panier
+        </button>
       </div>
     </div>
   </div>
@@ -981,23 +963,7 @@
       { id:'pc20', name:'Boursin',          desc:'Crème fraîche, mozzarella, boursin, lardons', emoji:'🧈', tag:'', img:'base creme/web/BOURSIN.webp' },
     ];
 
-    // ——— DATA : SUPPLÉMENTS (1,50 € chacun) ———
-    const SUPPLEMENT_PRICE = 1.50;
-    const supplements = {
-      viandes: [
-        'Poulet', 'Viande hachée', 'Merguez', 'Chorizo', 'Lardons',
-        'Jambon de dinde', 'Viande kebab', 'Dinde', 'Sucuk', 'Thon', 'Saumon fumé'
-      ],
-      fromages: [
-        'Mozzarella', 'Emmental', 'Cheddar', 'Chèvre', 'Bleu',
-        'Reblochon', 'Boursin', 'Raclette', 'Parmesan'
-      ],
-      legumes: [
-        'Champignons', 'Poivrons', 'Oignons', 'Olives', 'Tomate fraîche',
-        'Pomme de terre', 'Artichauts', 'Cornichons', 'Roquette', 'Oeuf'
-      ]
-    };
-    const suppCategoryLabels = { viandes: '🥩 Viandes', fromages: '🧀 Fromages', legumes: '🥬 Légumes' };
+    // (Suppléments supprimés — le client écrit une note libre)
 
     // ——— DATA : MENUS ———
     const menus = [
@@ -1304,7 +1270,7 @@
             <span class="text-2xl flex-shrink-0">${c.emoji}</span>
             <div class="flex-1 min-w-0">
               <p class="font-semibold text-sm text-coal-900 truncate">${c.name}</p>
-              ${c.supps && c.supps.length > 0 ? `<p class="text-[10px] text-amber-600 font-medium truncate">+ ${c.supps.join(', ')}</p>` : ''}
+              ${c.note ? `<p class="text-[10px] text-amber-600 font-medium truncate">📝 ${c.note}</p>` : ''}
               <p class="text-xs text-gray-400">${c.price.toFixed(2).replace('.',',')} € × ${c.qty}</p>
             </div>
             <div class="flex items-center gap-1.5">
@@ -1589,74 +1555,35 @@
       });
     });
 
-    // ——— SUPPLEMENT MODAL ———
+    // ——— NOTE PIZZA MODAL ———
     let pendingSuppPizzaId = null;
-    let selectedSupps = [];
 
     function openSuppModal(pizzaId) {
       pendingSuppPizzaId = pizzaId;
-      selectedSupps = [];
       const pizza = [...pizzasTomate,...pizzasCreme].find(p=>p.id===pizzaId);
       if(!pizza) return;
       const price = pizza.fixedPrice != null ? pizza.fixedPrice : sizePrices[currentSize];
       const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
       document.getElementById('suppPizzaName').textContent = `${pizza.emoji} ${pizza.name} (${sizeLabel}) — ${price.toFixed(2).replace('.',',')} €`;
-
-      // Build categories
-      const container = document.getElementById('suppCategories');
-      container.innerHTML = Object.entries(supplements).map(([cat, items]) => `
-        <div>
-          <p class="font-display font-semibold text-sm text-coal-800 mb-2">${suppCategoryLabels[cat]}</p>
-          <div class="flex flex-wrap gap-2">
-            ${items.map(item => `
-              <button onclick="toggleSupp(this,'${item.replace(/'/g,"\\'")}')"
-                class="supp-chip px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-gray-200 text-gray-600 hover:border-amber-400 hover:text-amber-700 transition-all"
-                data-supp="${item}">${item}</button>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
-
-      updateSuppTotal();
+      document.getElementById('pizzaNoteInput').value = '';
       document.getElementById('suppOverlay').classList.remove('hidden');
-    }
-
-    function toggleSupp(btn, name) {
-      const idx = selectedSupps.indexOf(name);
-      if(idx >= 0) {
-        selectedSupps.splice(idx, 1);
-        btn.classList.remove('bg-amber-100','border-amber-400','text-amber-800');
-        btn.classList.add('border-gray-200','text-gray-600');
-      } else {
-        selectedSupps.push(name);
-        btn.classList.add('bg-amber-100','border-amber-400','text-amber-800');
-        btn.classList.remove('border-gray-200','text-gray-600');
-      }
-      updateSuppTotal();
-    }
-
-    function updateSuppTotal() {
-      const total = selectedSupps.length * SUPPLEMENT_PRICE;
-      document.getElementById('suppTotalPrice').textContent = `+${total.toFixed(2).replace('.',',')} €`;
     }
 
     function closeSuppModal() {
       document.getElementById('suppOverlay').classList.add('hidden');
       pendingSuppPizzaId = null;
-      selectedSupps = [];
     }
 
-    function confirmSuppModal(withSupps) {
+    function confirmSuppModal() {
       if(!pendingSuppPizzaId) return;
-      const supps = withSupps ? [...selectedSupps] : [];
       const pizza = [...pizzasTomate,...pizzasCreme].find(p=>p.id===pendingSuppPizzaId);
       if(!pizza) return;
 
       const price = pizza.fixedPrice != null ? pizza.fixedPrice : sizePrices[currentSize];
-      const suppTotal = supps.length * SUPPLEMENT_PRICE;
       const sizeLabel = currentSize.charAt(0).toUpperCase()+currentSize.slice(1);
-      const suppKey = supps.length > 0 ? '_' + supps.sort().join('_').replace(/\s/g,'') : '';
-      const cartId = pendingSuppPizzaId + '_' + currentSize + suppKey;
+      const note = document.getElementById('pizzaNoteInput').value.trim();
+      const noteKey = note ? '_' + note.replace(/\s/g,'').substring(0,20) : '';
+      const cartId = pendingSuppPizzaId + '_' + currentSize + noteKey;
 
       const existing = cart.find(c=>c.id===cartId);
       if(existing) {
@@ -1664,18 +1591,18 @@
       } else {
         cart.push({
           id: cartId,
-          name: pizza.name + ' (' + sizeLabel + ')' ,
+          name: pizza.name + ' (' + sizeLabel + ')',
           desc: pizza.desc,
-          price: price + suppTotal,
+          price: price,
           emoji: pizza.emoji,
           qty: 1,
           type: 'pizza',
-          supps: supps
+          note: note || ''
         });
       }
       updateCartUI();
       showToast(pizza.emoji, pizza.name + ' ajoutée !');
-      showUpsell({ name: pizza.name + ' ' + sizeLabel, price: price + suppTotal, emoji: pizza.emoji });
+      showUpsell({ name: pizza.name + ' ' + sizeLabel, price: price, emoji: pizza.emoji });
       closeSuppModal();
     }
 
@@ -1887,7 +1814,7 @@
       }
       const itemsDesc = cart.map(c => {
         let line = `${c.qty};${c.name};${c.price.toFixed(2)}`;
-        if(c.supps && c.supps.length > 0) line += ';+' + c.supps.join('+');
+        if(c.note) line += ';Note: ' + c.note;
         return line;
       }).join('||') + clientDesc;
 
